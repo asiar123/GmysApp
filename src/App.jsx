@@ -15,15 +15,19 @@ function App() {
   const navigate = useNavigate();  // Para redireccionar
 
   useEffect(() => {
-    // Verificar el estado de autenticación
     const usuarioId = localStorage.getItem('usuario_id');
+    const currentPath = window.location.pathname;  // Obtiene la ruta actual
+  
     if (usuarioId) {
       setIsAuthenticated(true);  // Autenticado si existe el ID de usuario
     } else {
       setIsAuthenticated(false);  // No autenticado si no existe
-      navigate('/login');  // Redirigir al login si no autenticado
+      // Solo redirige al login si NO estás en la ruta inicial '/'
+      if (currentPath !== '/') {
+        navigate('/login');
+      }
     }
-  }, [navigate]);  // Ejecutar el efecto cada vez que cambie `navigate`
+  }, [navigate]);  
 
   return (
     <Routes>

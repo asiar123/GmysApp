@@ -1,0 +1,107 @@
+/* Variables de estilo */
+:root {
+    --color-principal: #646cff;
+    --color-hover: #535bf2;
+    --color-fondo-oscuro: #242424;
+    --color-fondo-claro: #ffffff;
+    --color-texto-claro: rgba(255, 255, 255, 0.87);
+    --color-texto-oscuro: #213547;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Estructura de la página */
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--color-fondo-oscuro);
+    color: var(--color-texto-claro);
+  }
+  
+  /* Header */
+  header {
+    background-color: #4b4b6f;
+    padding: 10px 20px;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo img {
+    width: 60px;
+  }
+  
+  h1 {
+    color: #fff;
+    font-size: 1.8rem;
+  }
+  
+  /* Login Form */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 80px); /* Ajustar la altura para restar el header y footer */
+  }
+  
+  .login-form {
+    background-color: #1a1a1a;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .login-form h2 {
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  
+  .login-form input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-principal);
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .login-form input:hover {
+    border-color: var(--color-hover);
+  }
+  
+  .login-form button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    background-color: var(--color-principal);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-form button:hover {
+    background-color: var(--color-hover);
+  }
+  
+  /* Footer */
+  footer {
+    background-color: #4b4b6f;
+    padding: 20px;
+    text-align: center;
+    margin-top: auto;
+  }
+  
+  footer p {
+    color: #fff;
+    font-size: 0.9rem;
+  }
+  

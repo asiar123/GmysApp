@@ -1,0 +1,12 @@
+.vehiculos__titulo {
+    color: var(--color-principal);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .vehiculos__descripcion {
+    color: var(--color-secundario);
+    font-size: 16px;
+  }
+  

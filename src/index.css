@@ -1,0 +1,177 @@
+:root {
+  --color-principal: #646cff;
+  --color-hover: #535bf2;
+  --color-fondo-oscuro: #242424;
+  --color-fondo-claro: #ffffff;
+  --color-texto-claro: rgba(255, 255, 255, 0.87);
+  --color-texto-oscuro: #213547;
+
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo-oscuro);
+  color: var(--color-texto-claro);
+  height: 100vh; /* Ocupa todo el alto de la ventana */
+  width: 100vw; /* Ocupa todo el ancho de la ventana */
+  box-sizing: border-box; /* Asegura que el padding y los bordes estén dentro del ancho */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100%; /* Abarca todo el ancho */
+}
+
+header, footer {
+  text-align: center;
+  padding: 20px;
+}
+
+header {
+  background-color: var(--color-fondo-oscuro);
+}
+
+footer {
+  background-color: var(--color-fondo-oscuro);
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1; /* Se expande para ocupar el espacio entre el header y el footer */
+  width: 100%; /* Asegura que main ocupe el ancho completo */
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-principal);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-hover);
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: var(--color-texto-claro);
+  cursor: pointer;
+  transition: border-color 0.25s, background-color 0.3s ease;
+}
+
+button:hover {
+  border-color: var(--color-principal);
+  background-color: var(--color-hover);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid var(--color-principal);
+  border-radius: 5px;
+  background-color: #333;
+  color: var(--color-texto-claro);
+  font-size: 1rem;
+}
+
+input[type="text"]:hover,
+input[type="password"]:hover {
+  border-color: var(--color-hover);
+}
+
+/* Modo Claro */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-texto-claro: var(--color-texto-oscuro);
+    --color-fondo-oscuro: var(--color-fondo-claro);
+  }
+
+  body {
+    background-color: var(--color-fondo-oscuro);
+    color: var(--color-texto-claro);
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+    color: var(--color-texto-oscuro);
+  }
+
+  button:hover {
+    background-color: var(--color-hover);
+    color: var(--color-texto-claro);
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100%; /* Abarca todo el ancho */
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Alinea el contenido al inicio en lugar del centro */
+  flex-grow: 1; /* Se expande para ocupar el espacio entre el header y el footer */
+  width: 100%; /* Asegura que main ocupe el ancho completo */
+  padding: 20px; /* Añadir un poco de espacio alrededor */
+}
+
+.table-container {
+  width: 100%;
+  max-width: 1200px; /* Puedes ajustar el máximo ancho */
+  overflow-y: auto; /* Hace que el contenido sea desplazable si es necesario */
+}
+
+.table {
+  width: 100%; /* Asegura que la tabla ocupe todo el espacio disponible */
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    padding: 0 10px;
+  }
+
+  .table thead {
+    font-size: 0.8rem;
+  }
+
+  .table td {
+    font-size: 0.9rem;
+  }
+}

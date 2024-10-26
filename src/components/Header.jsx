@@ -37,8 +37,9 @@ const Header = () => {
         ...styles.sideMenu, 
         transform: isMenuOpen ? 'translateX(0)' : 'translateX(-100%)' 
       }}>
-        <a href="#" style={styles.menuItem}>Inicio</a>
+        <a href="/dashboard" style={styles.menuItem}>Inicio</a>
         <Link to="/reportes" style={styles.menuItem}>Reportes</Link>
+        <Link to="/geocercas" style={styles.menuItem}>Ver Geocercas</Link>
         <a href="#" style={styles.menuItem}>Configuración</a>
         <a href="#" onClick={handleLogout} style={styles.menuItem}>Cerrar sesión</a>
       </div>

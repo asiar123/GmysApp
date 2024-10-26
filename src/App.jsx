@@ -10,7 +10,8 @@ import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';  
 import Recorrido from './components/Recorrido';  
 import Reportes from './components/Reportes'; // Importa el componente Reportes
-import { UserProvider } from './context/UserContext'; // Importa el proveedor del contexto
+import { UserProvider } from './context/UserContext'; // Importa el proveedor del contexto}
+import GeocercaView from './components/GeocercaView';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -78,6 +79,14 @@ function App() {
               element={
                 <ProtectedRoute isAuthenticated={isAuthenticated}>
                   <Reportes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/geocercas"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <GeocercaView />
                 </ProtectedRoute>
               }
             />

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import Vehiculos from './components/Vehiculos';
+import VehiculosDashboard from './components/VehiculosDashboard'; // Nuevo componente
 import VehiculoRecorrido from './components/VehiculoRecorrido';  
 import Eventos from './components/Eventos';
 import LoginPage from './pages/LoginPage';
@@ -9,9 +9,10 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';  
 import Recorrido from './components/Recorrido';  
-import Reportes from './components/Reportes'; // Importa el componente Reportes
-import { UserProvider } from './context/UserContext'; // Importa el proveedor del contexto}
+import Reportes from './components/Reportes'; 
+import { UserProvider } from './context/UserContext';
 import GeocercaView from './components/GeocercaView';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,16 +40,21 @@ function App() {
 
         {/* Rutas con Layout */}
         <Route path="*" element={<Layout> {/* Uso de "path=*" */}
+
+        <ErrorBoundary>
           <Routes>
             <Route path="/" element={<HomePage />} /> {/* Página de inicio */}
+            
+            {/* Ruta de VehiculosDashboard para listado de vehículos y consulta de consumo */}
             <Route
               path="/vehiculos"
               element={
                 <ProtectedRoute isAuthenticated={isAuthenticated}>
-                  <Vehiculos />
+                  <VehiculosDashboard /> {/* Usa el componente que integra Vehiculos y ConsumoVehiculo */}
                 </ProtectedRoute>
               }
             />
+            
             <Route
               path="/recorrido/:vehiId"
               element={
@@ -91,6 +97,8 @@ function App() {
               }
             />
           </Routes>
+      </ErrorBoundary>
+
         </Layout>} />
       </Routes>
     </UserProvider>

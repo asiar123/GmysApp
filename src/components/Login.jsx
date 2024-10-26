@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+// src/components/Login.jsx
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import qs from 'qs'; // Asegúrate de tener instalada esta librería
-import Cookies from 'js-cookie'; // Para manejar las cookies si es necesario
-import Loader from './Loader';  // Importamos el componente del Loader
+import qs from 'qs';
+import Cookies from 'js-cookie';
+import Loader from './Loader';
+import { UserContext } from '../context/UserContext'; // Importar el contexto de usuario
 import './Login.css';
 
 const Login = () => {
@@ -11,10 +13,11 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useContext(UserContext); // Obtener el método login del contexto
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // Mostrar el Loader al hacer login
+    setLoading(true);
 
     try {
       const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
@@ -29,32 +32,38 @@ const Login = () => {
       );
 
       const data = response.data;
-      const token = data.mensaje.token || 'dummy-token';  // Asegúrate de ajustar esto si cambia el formato del token
+      const token = data.mensaje.token;
 
       // Guardar el token en una cookie si es necesario
-      Cookies.set('token', token, { expires: 1, secure: true, sameSite: 'Strict' });
+      if (token) {
+        Cookies.set('token', token, { expires: 1, secure: true, sameSite: 'Strict' });
+      }
 
-      // Verificar y guardar el usuario_id en localStorage
+      // Verificar y guardar el usuario_id en el contexto y en localStorage
       if (data.mensaje.usuario_id) {
         localStorage.setItem('usuario_id', data.mensaje.usuario_id);
         console.log('ID de usuario guardado:', data.mensaje.usuario_id);
+
+        // Llamar al método login del contexto
+        login(data.mensaje.usuario_id, token);
       }
 
+      // Redirigir después de un breve retardo para el Loader
       setTimeout(() => {
-        setLoading(false); // Ocultar el Loader
-        navigate('/dashboard'); // Redirigir al dashboard
-      }, 2000); // Simulamos un tiempo de espera de 2 segundos para la animación
+        setLoading(false);
+        navigate('/dashboard');
+      }, 2000);
 
     } catch (error) {
       console.error('Error en la autenticación:', error.response?.data || error);
-      setLoading(false); // En caso de error, ocultamos el Loader
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
-      {loading ? (  // Si está cargando, mostramos el Loader
-        <Loader />   // Mostrar el Loader mientras esperamos
+      {loading ? (
+        <Loader />
       ) : (
         <form onSubmit={handleLogin} className="login-form">
           <h2>Iniciar Sesión</h2>
@@ -64,7 +73,7 @@ const Login = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            disabled={loading} // Desactivar campo mientras carga
+            disabled={loading}
           />
           <input
             type="password"
@@ -72,9 +81,9 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            disabled={loading} // Desactivar campo mientras carga
+            disabled={loading}
           />
-          <button type="submit" disabled={loading}>  
+          <button type="submit" disabled={loading}>
             {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>
         </form>

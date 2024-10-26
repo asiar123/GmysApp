@@ -40,6 +40,7 @@ const Header = () => {
         <a href="/dashboard" style={styles.menuItem}>Inicio</a>
         <Link to="/reportes" style={styles.menuItem}>Reportes</Link>
         <Link to="/geocercas" style={styles.menuItem}>Ver Geocercas</Link>
+        <Link to="/vehiculos" style={styles.menuItem}>Mis Vehículos</Link> {/* Nuevo enlace agregado */}
         <a href="#" style={styles.menuItem}>Configuración</a>
         <a href="#" onClick={handleLogout} style={styles.menuItem}>Cerrar sesión</a>
       </div>

@@ -1,0 +1,84 @@
+/* Contenedor principal */
+.recorrido-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #ffffff;
+    background-color: #0b1b33;
+    min-height: 100vh;
+  }
+  
+  /* Título */
+  .recorrido-container h1 {
+    font-size: 1.8rem;
+    color: #f5f5f5;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Formulario de fechas */
+  .recorrido-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .recorrido-container label {
+    font-size: 1rem;
+    color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Inputs de fecha */
+  .recorrido-container input[type="date"] {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 200px;
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+    background-color: #f5f5f5;
+  }
+  
+  /* Botón de "Ver Recorrido" */
+  .recorrido-container button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .recorrido-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  .recorrido-container button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  /* Ajustes responsivos */
+  @media (max-width: 768px) {
+    .recorrido-container h1 {
+      font-size: 1.5rem;
+    }
+  
+    .recorrido-container form {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+  

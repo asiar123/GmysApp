@@ -1,51 +1,115 @@
-/* Header.css */
-header {
-    position: relative;
+/* Header Estilos */
+.header {
+  background-color: #3b5998;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-size: 1.5rem;
+  position: fixed; /* Fijar el header en la parte superior */
+  top: 0; /* Asegura que el header esté en la parte superior */
+  left: 0;
+  width: 100%;
+  z-index: 2; /* Asegura que el header esté encima de otros elementos */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+
+.menu-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Side Menu */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250px;
+  background-color: #3b5998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(-100%);
+  z-index: 3;
+}
+
+.side-menu.open {
+  transform: translateX(0);
+}
+
+/* Menu items */
+.menu-item {
+  color: #fff;
+  padding: 1rem 0;
+  text-decoration: none;
+  font-size: 1.2rem;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #3b3b3b;
+}
+
+/* Overlay para cerrar el menú al hacer clic fuera */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+/* Ajustes responsivos para dispositivos móviles */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem 1rem;
   }
-  
-  nav {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  nav.open {
-    transform: translateX(0);
-  }
-  
-/* Estilos del menú desplegable en el header */
-.menu-container {
-    position: absolute;
-    top: 60px; /* Debajo del header */
-    left: 0;
-    width: 100%; /* Ocupa todo el ancho */
-    background-color: #2a2a2a; /* Fondo oscuro */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
-  }
-  
-  .menu-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .menu-item {
-    padding: 15px;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    color: white;
-    text-decoration: none;
-    transition: background-color 0.2s;
-  }
-  
-  .menu-item:hover {
-    background-color: #3b3b3b;
-  }
-  
+
+  .icon,
   .menu-icon {
-    margin-right: 10px;
+    font-size: 1.5rem; /* Tamaño más pequeño para iconos en móviles */
+  }
+
+  .title {
     font-size: 1.2rem;
   }
-  
+
+  .side-menu {
+    width: 200px; /* Menú más estrecho en móviles */
+  }
+
+  .menu-item {
+    font-size: 1rem; /* Tamaño de fuente reducido */
+    padding: 0.8rem 0; /* Padding reducido en móviles */
+  }
+}

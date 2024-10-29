@@ -1,13 +1,14 @@
-import './Layout.css'; // Importa el archivo CSS
+// src/components/Layout.jsx
+import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, showHeaderFooter }) => {
   return (
-    <div className="layout-container">
-      <Header />
+    <div>
+      {showHeaderFooter && <Header />}
       <main>{children}</main>
-      <Footer />
+      {showHeaderFooter && <Footer />}
     </div>
   );
 };

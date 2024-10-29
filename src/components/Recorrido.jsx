@@ -4,6 +4,7 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './Recorrido.css';
 
 // Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
@@ -89,6 +90,7 @@ function Recorrido() {
       <h1 className="text-2xl font-bold mb-4">Recorrido del Vehículo {vehiId}</h1>
 
       {/* Formulario para seleccionar fechas */}
+      {/* Formulario para seleccionar fechas */}
       <form onSubmit={handleSubmit} className="mb-4">
         <label>
           Fecha de Inicio:
@@ -99,7 +101,7 @@ function Recorrido() {
             required
           />
         </label>
-        <label className="ml-4">
+        <label>
           Fecha de Fin:
           <input
             type="date"
@@ -108,10 +110,11 @@ function Recorrido() {
             required
           />
         </label>
-        <button type="submit" className="ml-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">
+        <button type="submit" className="mt-2" disabled={!fechaInicio || !fechaFin}>
           Ver Recorrido
         </button>
       </form>
+
 
       {/* Renderizar el mapa si el recorrido está disponible */}
       {loading ? <p>Cargando...</p> : mostrarMapa && lineCoordinates.length > 0 && (

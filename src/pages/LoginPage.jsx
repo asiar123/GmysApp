@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import Login from '../components/Login'; // Asegúrate de que la ruta sea correcta
-import Header from '../components/Header'; // Si estás usando un header
-import Footer from '../components/Footer'; // Si tienes un footer
 import axios from 'axios';
 import qs from 'qs';  // Asegúrate de tener instalada esta librería
 import Cookies from 'js-cookie';  // Para manejar las cookies si es necesario
@@ -55,24 +53,20 @@ const LoginPage = () => {
   };
 
   return (
-    <>
-      <Header /> {/* Si estás usando un header */}
-      <main>
-        {/* Mostrar el loader mientras se está autenticando */}
-        {loading ? (
-          <Loader />  // Aquí se muestra el componente de animación de carga
-        ) : (
-          <Login
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
-            handleLogin={handleLogin}
-          />  // El componente de login pasará el estado y la función de autenticación
-        )}
-      </main>
-      <Footer /> {/* Si tienes un footer */}
-    </>
+    <main>
+      {/* Mostrar el loader mientras se está autenticando */}
+      {loading ? (
+        <Loader />  // Aquí se muestra el componente de animación de carga
+      ) : (
+        <Login
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+        />  // El componente de login pasará el estado y la función de autenticación
+      )}
+    </main>
   );
 };
 

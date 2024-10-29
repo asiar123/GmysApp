@@ -1,53 +1,57 @@
-/* Asegura que el body y el html ocupen todo el viewport */
+/* Asegura que el html y el body ocupen todo el viewport */
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden; /* Evita cualquier scroll innecesario */
+    overflow: hidden; /* Elimina el scroll globalmente */
 }
 
-/* HomePage.css */
+/* Fondo de la página de inicio */
 .homepage-background {
-    height: 100vh; /* Ocupar toda la altura de la ventana */
-    background-image: url('./assets/fd.png'); /* La ruta de tu imagen */
-    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-    background-position: center; /* Centra la imagen */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    height: 100vh;
+    background-image: url('/fd.png');
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    color: white; /* Asegura que el texto sea legible */
+    color: white;
     text-align: center;
-    width: 100vw; /* Asegura que ocupe todo el ancho */
+    width: 100vw;
+    padding-top: 8vh; /* Ajuste del espacio superior para el logo */
+    padding-bottom: 15vh; /* Aumenta el espacio inferior para el botón */
+    box-sizing: border-box;
 }
 
-/* Mejora del diseño del botón Iniciar */
+/* Ajuste en el botón */
 .btn-iniciar {
-    padding: 15px 40px; /* Aumenta el tamaño del botón */
-    background-color: #646cff; /* Color de fondo */
-    color: white; /* Color del texto */
-    font-size: 1.5rem; /* Aumenta el tamaño de la fuente */
+    padding: 15px 40px;
+    background-color: var(--color-principal);
+    color: var(--color-texto-claro);
+    font-size: 1.2rem;
     font-weight: bold;
-    border-radius: 12px; /* Bordes redondeados más suaves */
+    border-radius: 12px;
     border: none;
     cursor: pointer;
-    text-transform: uppercase; /* Texto en mayúsculas */
-    text-decoration: none; /* Quita el subrayado */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombra del botón */
-    transition: all 0.3s ease; /* Transición suave en hover */
-    margin-top: 20px;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: absolute; /* Coloca el botón de manera absoluta */
+    bottom: 120px; /* Ajusta la distancia del botón desde la parte inferior */
 }
 
 /* Efecto al pasar el cursor */
 .btn-iniciar:hover {
-    background-color: #535bf2; /* Color de fondo en hover */
-    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3); /* Aumenta la sombra en hover */
-    transform: translateY(-3px); /* Efecto de "levitar" */
+    background-color: var(--color-hover);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
 }
 
 /* Efecto al hacer clic */
 .btn-iniciar:active {
-    background-color: #4040c2; /* Color cuando se presiona el botón */
-    transform: translateY(2px); /* Mueve el botón hacia abajo para dar sensación de clic */
+    background-color: #4040c2;
+    transform: translateY(2px);
 }

@@ -1,6 +1,8 @@
 /* Contenedor principal del Dashboard */
 .dashboard-container {
   padding-top: 20px;
+  padding-left: 5px;
+  padding-right: 5px;
   min-height: 100vh;
   background-color: #0b1b33;
   color: white;
@@ -12,7 +14,7 @@
 
 /* Contenedor de la tabla */
 .container-table {
-  width: 80%;
+  width: 90%; /* Ajustado a 90% para pantallas pequeñas */
   max-width: 1000px;
   margin: 0 auto;
   background-color: #ffffff;

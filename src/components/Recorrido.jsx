@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import './Recorrido.css';
 import carIcon from '../assets/car.png';
 
-// Crear íconos personalizados
+// Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
   className: "custom-start-icon",
   html: '<div style="background-color:red; width: 20px; height: 20px; border-radius: 50%;"></div>',
@@ -16,13 +16,15 @@ const startIcon = L.divIcon({
   popupAnchor: [0, -10],
 });
 
+// Crear ícono de fin (vehículo con imagen personalizada)
 const endIcon = L.icon({
-  iconUrl: carIcon, // Usar la variable importada
-  iconSize: [40, 40], // Tamaño del ícono
-  iconAnchor: [20, 20], // Ancla del ícono
-  popupAnchor: [0, -20], // Posición del popup
+  iconUrl: carIcon,
+  iconSize: [50, 50], // Aumenta el tamaño del ícono para destacarlo
+  iconAnchor: [25, 25], // Centra el ícono
+  popupAnchor: [0, -25],
 });
 
+// Crear ícono predeterminado para puntos intermedios (punto azul)
 const customPin = L.divIcon({
   className: "custom-pin-icon",
   html: '<div style="background-color:blue; width: 15px; height: 15px; border-radius: 50%;"></div>',
@@ -57,7 +59,6 @@ function Recorrido() {
 
   // Función para obtener el recorrido del vehículo
   const fetchRecorrido = async () => {
-    // Solo proceder si las fechas están asignadas
     if (!fechaInicio || !fechaFin) return;
 
     setLoading(true);
@@ -101,7 +102,6 @@ function Recorrido() {
   return (
     <div className="recorrido-container">
       <h1 className="text-2xl font-bold mb-4">Recorrido del Vehículo {vehiId}</h1>
-
       {/* Renderizar el mapa si el recorrido está disponible */}
       {loading ? <p>Cargando...</p> : mostrarMapa && lineCoordinates.length > 0 && (
         <MapContainer
@@ -127,6 +127,7 @@ function Recorrido() {
                   key={index}
                   position={coordinates}
                   icon={isFirstPoint ? startIcon : isLastPoint ? endIcon : customPin}
+                  zIndexOffset={isLastPoint ? 1000 : 0} // Asegura que el endIcon esté encima de otros
                 >
                   <Popup>
                     Velocidad: {punto.velocidad} km/h

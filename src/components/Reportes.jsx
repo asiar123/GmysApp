@@ -4,6 +4,8 @@ import { UserContext } from '../context/UserContext';
 import { getVehicles } from "../services/authService";
 import { Table, Pagination } from 'react-bootstrap'; // Importamos componentes de Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './reportes.css';
+import { Link } from 'react-router-dom'; // Importa Link para manejar la redirección
 
 const Reportes = () => {
   const { usuarioId } = useContext(UserContext);
@@ -52,7 +54,6 @@ const Reportes = () => {
         },
       });
 
-      // Filtrar datos válidos y convertir `position` a latitud y longitud
       const recorridoData = response.data
         .filter((item) => item.position)
         .map((item) => {
@@ -68,7 +69,7 @@ const Reportes = () => {
         });
 
       setRecorrido(recorridoData);
-      setCurrentPage(1); // Reseteamos a la primera página
+      setCurrentPage(1);
     } catch (error) {
       console.error('Error al obtener el recorrido:', error);
     } finally {
@@ -109,7 +110,8 @@ const Reportes = () => {
           Fecha de Fin:
           <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
         </label>
-        <button type="submit" className="ml-4 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">
+        <br></br>
+        <button type="submit" className="centrar-boton">
           Ver Reporte
         </button>
       </form>
@@ -117,13 +119,12 @@ const Reportes = () => {
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <div>
+        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
           <Table striped bordered hover>
             <thead>
               <tr>
                 <th>Fecha</th>
                 <th>Placa</th>
-                <th>ID Vehículo</th>
                 <th>Descripción</th>
                 <th>Posición (Lat, Lng)</th>
               </tr>
@@ -133,10 +134,12 @@ const Reportes = () => {
                 <tr key={index}>
                   <td>{item.fecha}</td>
                   <td>{item.placa}</td>
-                  <td>{item.vehi_id}</td>
                   <td>{item.descripcion}</td>
-                  <td>({item.lat}, {item.lng})</td>
-                </tr>
+                  <td>
+                    <Link to={`/posicion/${item.lat}/${item.lng}`}>
+                      ({item.lat}, {item.lng})
+                    </Link>
+                  </td>                </tr>
               ))}
             </tbody>
           </Table>

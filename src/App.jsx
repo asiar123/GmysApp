@@ -13,6 +13,7 @@ import Reportes from './components/Reportes';
 import { UserProvider } from './context/UserContext';
 import GeocercaView from './components/GeocercaView';
 import ErrorBoundary from './components/ErrorBoundary';
+import PosicionMapa from './components/PosicionMapa';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -95,6 +96,14 @@ function App() {
                     element={
                       <ProtectedRoute isAuthenticated={isAuthenticated}>
                         <GeocercaView />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/posicion/:lat/:lng"
+                    element={
+                      <ProtectedRoute isAuthenticated={isAuthenticated}>
+                        <PosicionMapa />
                       </ProtectedRoute>
                     }
                   />

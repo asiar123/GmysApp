@@ -28,3 +28,13 @@
 .centrar-boton:hover {
   background-color: #3b5998;
 }
+
+.position-link i {
+  font-size: 1.2em; /* Tamaño del icono */
+  color: #e74c3c; /* Color del icono */
+  transition: color 0.3s;
+}
+
+.position-link i:hover {
+  color: #c0392b; /* Color al hacer hover */
+}

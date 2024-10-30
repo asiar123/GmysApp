@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getVehicles } from "../services/authService";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Dashboard.css';
+import iconoVerRecorrido from '../assets/custom_pin4.png'; // Ajusta la ruta según tu estructura de archivos
 
 function Dashboard() {
   const [data, setData] = useState([]);
@@ -68,16 +70,23 @@ function Dashboard() {
                 data.map((vehiculo) => (
                   <tr key={vehiculo.vehi_id}>
                     <td>{vehiculo.vehi_placa || 'Sin placa'}</td>
-                    <td>{vehiculo.velocidad !== null ? `${vehiculo.velocidad.toFixed(1)} km/h` : 'Velocidad desconocida'}</td>
+                    <td>
+                      <span 
+                        className={`status-indicator ${vehiculo.velocidad > 0 ? 'green' : 'red'}`}
+                        title={vehiculo.velocidad > 0 ? 'En movimiento' : 'Detenido'}
+                      ></span>
+                      {vehiculo.velocidad !== null ? `${vehiculo.velocidad.toFixed(1)} km/h` : 'Velocidad desconocida'}
+                    </td>
                     <td>{vehiculo.descripcion || 'Ubicación no disponible'}</td>
                     <td>{vehiculo.fecha || 'Fecha no disponible'}</td>
                     <td>
-                      <button
-                        className="btn btn-primary btn-sm"
+                      <img
+                        src={iconoVerRecorrido}
+                        alt="Ver Recorrido"
+                        className="icono-ver-recorrido"
                         onClick={() => handleVerRecorrido(vehiculo.vehi_id)}
-                      >
-                        Ver Recorrido
-                      </button>
+                        style={{ cursor: 'pointer' }}
+                      />
                     </td>
                   </tr>
                 ))
@@ -92,7 +101,6 @@ function Dashboard() {
       </div>
     </div>
   );
-  
 }
 
 export default Dashboard;

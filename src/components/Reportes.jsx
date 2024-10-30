@@ -136,10 +136,11 @@ const Reportes = () => {
                   <td>{item.placa}</td>
                   <td>{item.descripcion}</td>
                   <td>
-                    <Link to={`/posicion/${item.lat}/${item.lng}`}>
-                      ({item.lat}, {item.lng})
+                    <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
+                      <i className="fas fa-map-marker-alt"></i> {/* Icono de marcador */}
                     </Link>
-                  </td>                </tr>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </Table>

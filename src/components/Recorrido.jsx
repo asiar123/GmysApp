@@ -5,8 +5,9 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Recorrido.css';
+import carIcon from '../assets/car.png';
 
-// Crear ícono de inicio (punto rojo)
+// Crear íconos personalizados
 const startIcon = L.divIcon({
   className: "custom-start-icon",
   html: '<div style="background-color:red; width: 20px; height: 20px; border-radius: 50%;"></div>',
@@ -15,16 +16,13 @@ const startIcon = L.divIcon({
   popupAnchor: [0, -10],
 });
 
-// Crear ícono de fin (vehículo)
-const endIcon = L.divIcon({
-  className: "custom-end-icon",
-  html: '<i class="fas fa-car" style="font-size: 30px; color:blue;"></i>',
-  iconSize: [60, 60],
-  iconAnchor: [15, 15],
-  popupAnchor: [0, -15],
+const endIcon = L.icon({
+  iconUrl: carIcon, // Usar la variable importada
+  iconSize: [40, 40], // Tamaño del ícono
+  iconAnchor: [20, 20], // Ancla del ícono
+  popupAnchor: [0, -20], // Posición del popup
 });
 
-// Crear ícono predeterminado para puntos intermedios (punto azul)
 const customPin = L.divIcon({
   className: "custom-pin-icon",
   html: '<div style="background-color:blue; width: 15px; height: 15px; border-radius: 50%;"></div>',
@@ -41,6 +39,14 @@ function Recorrido() {
   const [fechaFin, setFechaFin] = useState('');
   const [mostrarMapa, setMostrarMapa] = useState(false);
 
+  // Configurar la fecha actual al cargar el componente
+  useEffect(() => {
+    const hoy = new Date().toISOString().split('T')[0];
+    setFechaInicio(hoy);
+    setFechaFin(hoy);
+    console.log("Fecha configurada:", hoy);
+  }, []);
+
   // Función para extraer coordenadas de la cadena
   const extractCoordinates = (positionString) => {
     if (!positionString) return null;
@@ -51,8 +57,12 @@ function Recorrido() {
 
   // Función para obtener el recorrido del vehículo
   const fetchRecorrido = async () => {
+    // Solo proceder si las fechas están asignadas
+    if (!fechaInicio || !fechaFin) return;
+
     setLoading(true);
     try {
+      console.log("Enviando fechas:", fechaInicio, fechaFin);
       const response = await axios.get(`https://proxy-gmys.onrender.com/vehiculo_recorrido`, {
         params: {
           vehi_id: vehiId,
@@ -63,7 +73,7 @@ function Recorrido() {
 
       const data = response.data;
       if (Array.isArray(data)) {
-        const puntosValidos = data.filter((punto) => punto.position);
+        const puntosValidos = data.filter((punto) => punto.position && punto.position.includes(','));
         setRecorrido(puntosValidos);
       } else {
         console.error('La respuesta no es un array válido:', data);
@@ -75,52 +85,28 @@ function Recorrido() {
     }
   };
 
-  // Maneja el envío del formulario para obtener el recorrido
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setMostrarMapa(true);
-    fetchRecorrido();
-  };
+  // Solo llamar a fetchRecorrido si las fechas están configuradas
+  useEffect(() => {
+    if (fechaInicio && fechaFin) {
+      setMostrarMapa(true);
+      fetchRecorrido();
+    }
+  }, [fechaInicio, fechaFin]);
 
   // Generar las coordenadas para la línea del recorrido
-  const lineCoordinates = recorrido.map((punto) => extractCoordinates(punto.position)).filter(Boolean);
+  const lineCoordinates = recorrido
+    .map((punto) => extractCoordinates(punto.position))
+    .filter(Boolean);
 
   return (
     <div className="recorrido-container">
       <h1 className="text-2xl font-bold mb-4">Recorrido del Vehículo {vehiId}</h1>
 
-      {/* Formulario para seleccionar fechas */}
-      {/* Formulario para seleccionar fechas */}
-      <form onSubmit={handleSubmit} className="mb-4">
-        <label>
-          Fecha de Inicio:
-          <input
-            type="date"
-            value={fechaInicio}
-            onChange={(e) => setFechaInicio(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Fecha de Fin:
-          <input
-            type="date"
-            value={fechaFin}
-            onChange={(e) => setFechaFin(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit" className="mt-2" disabled={!fechaInicio || !fechaFin}>
-          Ver Recorrido
-        </button>
-      </form>
-
-
       {/* Renderizar el mapa si el recorrido está disponible */}
       {loading ? <p>Cargando...</p> : mostrarMapa && lineCoordinates.length > 0 && (
         <MapContainer
           key={vehiId}
-          center={lineCoordinates[0]}  // Centrar el mapa en la primera coordenada
+          center={lineCoordinates[0]}
           zoom={13}
           style={{ height: '500px', width: '100%' }}
         >

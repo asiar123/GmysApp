@@ -87,80 +87,105 @@ const Reportes = () => {
   };
 
   return (
-    <div className="reportes-container">
-      <h1 className="text-2xl font-bold mb-4">Reportes de Vehículos</h1>
-
+    <div className="reportes-container container mt-4">
       <form onSubmit={handleSubmit} className="mb-4">
-        <label>
-          Selecciona el Vehículo:
-          <select value={vehiId} onChange={(e) => setVehiId(e.target.value)} required>
-            <option value="">Selecciona una placa</option>
-            {vehiculos.map((vehiculo) => (
-              <option key={vehiculo.vehi_id} value={vehiculo.vehi_id}>
-                {vehiculo.vehi_placa}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="ml-4">
-          Fecha de Inicio:
-          <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
-        </label>
-        <label className="ml-4">
-          Fecha de Fin:
-          <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
-        </label>
-        <br></br>
-        <button type="submit" className="centrar-boton">
-          Ver Reporte
-        </button>
-      </form>
-
-      {loading ? (
-        <p>Cargando...</p>
-      ) : (
-        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Placa</th>
-                <th>Descripción</th>
-                <th>Posición (Lat, Lng)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedData.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.fecha}</td>
-                  <td>{item.placa}</td>
-                  <td>{item.descripcion}</td>
-                  <td>
-                    <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
-                      <i className="fas fa-map-marker-alt"></i> {/* Icono de marcador */}
-                    </Link>
-                  </td>
-                </tr>
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Selecciona el Vehículo:</label>
+            <select
+              className="form-select"
+              value={vehiId}
+              onChange={(e) => setVehiId(e.target.value)}
+              required
+            >
+              <option value="">Selecciona una placa</option>
+              {vehiculos.map((vehiculo) => (
+                <option key={vehiculo.vehi_id} value={vehiculo.vehi_id}>
+                  {vehiculo.vehi_placa}
+                </option>
               ))}
-            </tbody>
-          </Table>
-
-          {/* Paginación */}
-          <Pagination className="justify-content-center mt-3">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={i + 1 === currentPage}
-                onClick={() => handlePageChange(i + 1)}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-          </Pagination>
+            </select>
+          </div>
+  
+          <div className="col-md-4">
+            <label className="form-label">Fecha de Inicio:</label>
+            <input
+              type="date"
+              className="form-control"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+              required
+            />
+          </div>
+  
+          <div className="col-md-4">
+            <label className="form-label">Fecha de Fin:</label>
+            <input
+              type="date"
+              className="form-control"
+              value={fechaFin}
+              onChange={(e) => setFechaFin(e.target.value)}
+              required
+            />
+          </div>
         </div>
+  
+        <div className="text-center">
+          <button type="submit" className="btn btn-primary">
+            Ver Reporte
+          </button>
+        </div>
+      </form>
+  
+      {loading ? (
+        <p className="text-center">Cargando...</p>
+      ) : (
+        recorrido.length > 0 && (
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <table className="table table-striped table-bordered table-hover">
+              <thead className="table-dark">
+                <tr>
+                  <th className="text-center">Fecha</th>
+                  <th className="text-center">Placa</th>
+                  <th className="text-center">Descripción</th>
+                  <th className="text-center">Posición (Lat, Lng)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedData.map((item, index) => (
+                  <tr key={index}>
+                    <td className="text-center">{item.fecha}</td>
+                    <td className="text-center">{item.placa}</td>
+                    <td className="text-center">{item.descripcion}</td>
+                    <td className="text-center">
+                      <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
+                        <i className="fas fa-map-marker-alt"></i> {/* Icono de marcador */}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+  
+            {/* Paginación */}
+            <Pagination className="justify-content-center mt-3">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              ))}
+            </Pagination>
+          </div>
+        )
       )}
     </div>
   );
+  
+
 };
 
 export default Reportes;

@@ -1,9 +1,9 @@
 import React from 'react';
-import './Loader.css'; // Puedes crear estilos si lo deseas
+import './Loader.css';
 
-const Loader = () => {
+const Loader = ({ className }) => {
   return (
-    <div className="loader-container">
+    <div className={`loader-container ${className}`}>
       <div className="spinner"></div>
     </div>
   );

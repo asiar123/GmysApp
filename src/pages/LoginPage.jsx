@@ -5,69 +5,68 @@ import qs from 'qs';  // Asegúrate de tener instalada esta librería
 import Cookies from 'js-cookie';  // Para manejar las cookies si es necesario
 import { useNavigate } from 'react-router-dom'; // Para redirigir después del login
 import Loader from '../components/Loader'; // Asumiendo que el componente del loader ya existe
+import locationGif from '../assets/point.gif';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Inicializar la función para redirigir
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // Mostrar la animación de carga
+    setLoading(true);
 
     try {
       const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-
       const response = await axios.post(
-        'https://proxy-gmys.onrender.com/login',  // Reemplaza con la URL correcta de tu API
-        qs.stringify({
-          usuario: username,
-          passwd: password,
-        }),
+        'https://proxy-gmys.onrender.com/login', 
+        qs.stringify({ usuario: username, passwd: password }),
         { headers }
       );
 
       const data = response.data;
-      const token = data.mensaje.token || 'dummy-token';  // Ajusta si cambia el formato del token
-
-      // Guardar el token en una cookie si es necesario
+      const token = data.mensaje.token || 'dummy-token';
       Cookies.set('token', token, { expires: 1, secure: true, sameSite: 'Strict' });
 
-      // Verificar y guardar el usuario_id en localStorage
       if (data.mensaje.usuario_id) {
         localStorage.setItem('usuario_id', data.mensaje.usuario_id);
         console.log('ID de usuario guardado:', data.mensaje.usuario_id);
       }
 
-      // Simular un pequeño delay antes de redirigir (puedes eliminar este `setTimeout` si no es necesario)
       setTimeout(() => {
-        setLoading(false); // Ocultar el Loader
-        navigate('/dashboard'); // Redirigir al dashboard
-      }, 2000); // Ajusta el tiempo si prefieres que sea inmediato
+        setLoading(false);
+        navigate('/dashboard');
+      }, 2000);
 
     } catch (error) {
       console.error('Error en la autenticación:', error.response?.data || error);
-      setLoading(false); // Ocultar el Loader en caso de error
+      setLoading(false);
     }
   };
 
   return (
-    <main>
-      {/* Mostrar el loader mientras se está autenticando */}
+    <main className="login-container">
       {loading ? (
-        <Loader />  // Aquí se muestra el componente de animación de carga
+        <Loader />  
       ) : (
-        <Login
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />  // El componente de login pasará el estado y la función de autenticación
+        <>
+          <Login
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+          />
+          {/* Agrega el GIF debajo del formulario */}
+          <div className="gps-animation">
+            <img src={locationGif} alt="GPS Animation" />
+          </div>
+        </>
       )}
     </main>
   );
 };
 
 export default LoginPage;
+

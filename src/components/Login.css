@@ -12,6 +12,7 @@
 /* Contenedor principal de la página */
 .login-container {
   display: flex;
+  flex-direction: column; /* Apilar elementos verticalmente */
   justify-content: center;
   align-items: center;
   height: calc(100vh - 160px); /* Ajustar la altura */
@@ -84,4 +85,16 @@
 .login-form button:active {
   background-color: #4040c2;
   transform: translateY(1px);
+}
+
+.gps-animation {
+  display: flex;
+  justify-content: center;
+  width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
+  margin-top: 10px; /* Ajusta según el espacio que desees debajo del formulario */
+}
+
+.gps-animation img {
+  width: 100px; /* Ajusta el tamaño según prefieras */
+  height: 100px;
 }

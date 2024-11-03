@@ -11,7 +11,7 @@
   top: 0; /* Asegura que el header esté en la parte superior */
   left: 0;
   width: 100%;
-  z-index: 2; /* Asegura que el header esté encima de otros elementos */
+  z-index: 1001; /* Asegura que el header esté encima de otros elementos */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 

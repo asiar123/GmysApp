@@ -5,12 +5,12 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Recorrido.css';
-import carIcon from '../assets/car.png';
+import carIcon from '../assets/car_thicker_bubble.png';
 
 // Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
   className: "custom-start-icon",
-  html: '<div style="background-color:red; width: 20px; height: 20px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:#1ABC9C; width: 20px; height: 20px; border-radius: 50%;"></div>',
   iconSize: [20, 20],
   iconAnchor: [10, 10],
   popupAnchor: [0, -10],
@@ -32,6 +32,59 @@ const customPin = L.divIcon({
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],
 });
+
+// Objeto de caché para almacenar coordenadas y direcciones
+const direccionCache = {};
+
+// Función para obtener la dirección desde la API de OpenCage, con caché
+const getDireccion = async (lat, lng) => {
+  const key = `${lat},${lng}`;
+
+  if (direccionCache[key]) {
+    return direccionCache[key];
+  }
+
+  try {
+    const response = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+      params: {
+        q: `${lat},${lng}`,
+        key: '9691c74304904ebaaadedff2a9f25f2f', // Reemplaza aquí con tu clave completa de OpenCage
+        limit: 1,
+      },
+    });
+    const direccion = response.data.results[0]?.formatted || 'Dirección no disponible';
+    direccionCache[key] = direccion;
+    return direccion;
+  } catch (error) {
+    console.error('Error al obtener la dirección:', error);
+    return 'Dirección no disponible';
+  }
+};
+
+const formatFecha = (fechaString) => {
+  // Reemplaza el guion bajo con un espacio para que el formato sea compatible
+  const fechaNormalizada = fechaString.replace('_', ' ');
+
+  const fecha = new Date(fechaNormalizada);
+
+  // Verifica si la fecha es válida
+  if (isNaN(fecha.getTime())) {
+    console.warn("Fecha inválida:", fechaString);
+    return "Fecha no disponible";
+  }
+
+  const opciones = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+
+  return fecha.toLocaleDateString('es-ES', opciones);
+};
+
+
 
 function Recorrido() {
   const { vehiId } = useParams();
@@ -57,14 +110,14 @@ function Recorrido() {
     return [lat, lng];
   };
 
-  // Función para obtener el recorrido del vehículo
+  // Función para obtener el recorrido del vehículo y las direcciones
   const fetchRecorrido = async () => {
     if (!fechaInicio || !fechaFin) return;
 
     setLoading(true);
     try {
       console.log("Enviando fechas:", fechaInicio, fechaFin);
-      const response = await axios.get(`https://proxy-gmys.onrender.com/vehiculo_recorrido`, {
+      const response = await axios.get('https://proxy-gmys.onrender.com/vehiculo_recorrido', {
         params: {
           vehi_id: vehiId,
           fecha_i: fechaInicio,
@@ -74,7 +127,16 @@ function Recorrido() {
 
       const data = response.data;
       if (Array.isArray(data)) {
-        const puntosValidos = data.filter((punto) => punto.position && punto.position.includes(','));
+        const puntosValidos = await Promise.all(data.map(async (punto) => {
+          if (punto.position && punto.position.includes(',')) {
+            const coordinates = extractCoordinates(punto.position);
+            if (coordinates) {
+              const direccion = await getDireccion(coordinates[0], coordinates[1]);
+              return { ...punto, direccion }; // Agrega la dirección al punto
+            }
+          }
+          return punto;
+        }));
         setRecorrido(puntosValidos);
       } else {
         console.error('La respuesta no es un array válido:', data);
@@ -114,7 +176,7 @@ function Recorrido() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
-          <Polyline positions={lineCoordinates} color="blue" weight={5} />
+          <Polyline positions={lineCoordinates} color="blue" weight={3} />
 
           {recorrido.map((punto, index) => {
             const coordinates = extractCoordinates(punto.position);
@@ -130,9 +192,11 @@ function Recorrido() {
                   zIndexOffset={isLastPoint ? 1000 : 0} // Asegura que el endIcon esté encima de otros
                 >
                   <Popup>
-                    Velocidad: {punto.velocidad} km/h
+                    Velocidad: {parseFloat(punto.velocidad).toFixed(1)} km/h
                     <br />
-                    Fecha: {punto.dia}
+                    Fecha: {formatFecha(punto.dia)}
+F                    <br />
+                    Dirección: {punto.direccion || 'Cargando dirección...'}
                   </Popup>
                 </Marker>
               );

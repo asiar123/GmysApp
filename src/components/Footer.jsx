@@ -10,7 +10,7 @@ const Footer = () => {
 
 const styles = {
   footer: {
-    backgroundColor: '#3b5998', // Cambia este color al azul claro deseado
+    backgroundColor: '#1B4F72', // Cambia este color al azul claro deseado
     padding: '1rem',
     textAlign: 'center',
     color: '#fff',

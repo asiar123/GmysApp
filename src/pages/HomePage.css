@@ -9,7 +9,7 @@ html, body {
 /* Fondo de la página de inicio */
 .homepage-background {
     height: 100vh;
-    background-image: url('/fd.png');
+    background-image: url('/fd5.png');
     background-size: contain;
     background-position: top center;
     background-repeat: no-repeat;
@@ -21,14 +21,14 @@ html, body {
     color: white;
     text-align: center;
     width: 100vw;
-    padding-top: 8vh; /* Ajuste del espacio superior para el logo */
+    padding-top: 9vh; /* Ajuste del espacio superior para el logo */
     padding-bottom: 15vh; /* Aumenta el espacio inferior para el botón */
     box-sizing: border-box;
 }
 
 .btn-iniciar {
     padding: 15px 40px;
-    background: linear-gradient(135deg, var(--color-principal), #5a5af0); /* Mantén el color principal y añade un tono ligeramente más claro */
+    background: #00CFC1; /* Mantén el color principal y añade un tono ligeramente más claro */
     color: var(--color-texto-claro);
     font-size: 1.2rem;
     font-weight: bold;
@@ -41,6 +41,7 @@ html, body {
     transition: all 0.3s ease;
     position: absolute;
     bottom: 120px;
+    margin: 60px;
 }
 
 .btn-iniciar:hover {
@@ -52,4 +53,35 @@ html, body {
 .btn-iniciar:active {
     background: #4040c2;
     transform: translateY(2px);
+}
+
+/* HomePage.css */
+
+/* ... existing styles ... */
+
+@media (max-width: 768px) {
+    .homepage-background {
+        padding-top: 4vh;
+        padding-bottom: 10vh;
+        background-size: cover; /* Adjust to cover smaller screens */
+    }
+
+    .btn-iniciar {
+        padding: 12px 30px;
+        font-size: 1rem;
+        bottom: 80px; /* Adjust button position for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .homepage-background {
+        padding-top: 2vh;
+        padding-bottom: 8vh;
+    }
+
+    .btn-iniciar {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+        bottom: 60px;
+    }
 }

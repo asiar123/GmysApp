@@ -6,6 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Recorrido.css';
 import carIcon from '../assets/car_thicker_bubble.png';
+import { useMap } from 'react-leaflet';
 
 // Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
@@ -84,7 +85,19 @@ const formatFecha = (fechaString) => {
   return fecha.toLocaleDateString('es-ES', opciones);
 };
 
+// New component to center the map
+const CenterMap = ({ coordinates }) => {
+  const map = useMap();
 
+  useEffect(() => {
+    if (coordinates.length > 0) {
+      const bounds = L.latLngBounds(coordinates); // Calculate bounds based on the route
+      map.fitBounds(bounds); // Center and zoom to fit the route
+    }
+  }, [coordinates, map]);
+
+  return null;
+};
 
 function Recorrido() {
   const { vehiId } = useParams();
@@ -176,6 +189,7 @@ function Recorrido() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
+          <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
           <Polyline positions={lineCoordinates} color="blue" weight={3} />
 
           {recorrido.map((punto, index) => {
@@ -195,7 +209,7 @@ function Recorrido() {
                     Velocidad: {parseFloat(punto.velocidad).toFixed(1)} km/h
                     <br />
                     Fecha: {formatFecha(punto.dia)}
-F                    <br />
+                    <br />
                     Dirección: {punto.direccion || 'Cargando dirección...'}
                   </Popup>
                 </Marker>

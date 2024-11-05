@@ -42,13 +42,13 @@ function Dashboard() {
 
   function formatFecha(fecha) {
     if (!fecha) return 'Fecha no disponible';
-  
+
     // Reemplaza caracteres no estándar si es necesario
     const fechaNormalizada = fecha.replace(/_/g, ' ');
-  
+
     const date = new Date(fechaNormalizada);
     if (isNaN(date.getTime())) return 'Fecha no disponible';
-  
+
     const formattedDate = date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
@@ -58,14 +58,14 @@ function Dashboard() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  
+
     return `${formattedDate} ${formattedTime}`;
-  }  
+  }
 
   return (
     <div className="dashboard-container">
       <h1 className="text-center mb-4">Mis Vehículos</h1>
-  
+
       {loading ? (
         <div className="text-center">
           <div className="spinner-border" role="status">
@@ -77,9 +77,6 @@ function Dashboard() {
           {data.length > 0 ? (
             data.map((vehiculo) => (
               <div key={vehiculo.vehi_id} className="vehicle-card horizontal">
-                <div className="card-header">
-                  <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
-                </div>
                 <div className="card-body">
                   <p className="velocidad">
                     <span
@@ -90,7 +87,14 @@ function Dashboard() {
                       ? `${vehiculo.velocidad.toFixed(1)} km/h`
                       : 'Velocidad desconocida'}
                   </p>
-                  <p className="ubicacion">{vehiculo.descripcion || 'Ubicación no disponible'}</p>
+                </div>
+                <div className="card-header">
+                  <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
+                </div>
+                <div className="card-body">
+                <p className="ubicacion">{vehiculo.descripcion || 'Ubicación no disponible'}</p>
+                </div>
+                <div className="card-body">
                   <p className="fecha">{formatFecha(vehiculo.fecha)}</p>
                 </div>
                 <div className="card-footer">
@@ -107,15 +111,16 @@ function Dashboard() {
             <p className="text-center">No se han cargado los datos aún.</p>
           )}
         </div>
+
       )}
-  
+
       {/* Agregar el GIF en la parte inferior */}
       <div className="gps-animation">
         <img src={locationGif} alt="GPS Animation" />
       </div>
     </div>
   );
-  
+
 }
 
 export default Dashboard;

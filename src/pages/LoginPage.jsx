@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Login from '../components/Login'; // Asegúrate de que la ruta sea correcta
 import axios from 'axios';
-import qs from 'qs';  // Asegúrate de tener instalada esta librería
-import Cookies from 'js-cookie';  // Para manejar las cookies si es necesario
-import { useNavigate } from 'react-router-dom'; // Para redirigir después del login
-import Loader from '../components/Loader'; // Asumiendo que el componente del loader ya existe
+import qs from 'qs';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
+import { UserContext } from '../context/UserContext';
 import locationGif from '../assets/point.gif';
 
 const LoginPage = () => {
@@ -12,6 +13,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useContext(UserContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,24 +22,26 @@ const LoginPage = () => {
     try {
       const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
       const response = await axios.post(
-        'https://proxy-gmys.onrender.com/login', 
+        'https://proxy-gmys.onrender.com/login',
         qs.stringify({ usuario: username, passwd: password }),
         { headers }
       );
 
       const data = response.data;
-      const token = data.mensaje.token || 'dummy-token';
-      Cookies.set('token', token, { expires: 1, secure: true, sameSite: 'Strict' });
+      const token = data.mensaje.token;
+
+      if (token) {
+        Cookies.set('token', token, { expires: 1, secure: true, sameSite: 'Strict' });
+      }
 
       if (data.mensaje.usuario_id) {
         localStorage.setItem('usuario_id', data.mensaje.usuario_id);
         console.log('ID de usuario guardado:', data.mensaje.usuario_id);
+        login(data.mensaje.usuario_id, token);  // Actualizar el contexto de usuario
       }
 
-      setTimeout(() => {
-        setLoading(false);
-        navigate('/dashboard');
-      }, 2000);
+      setLoading(false);  // Desactivar Loader
+      navigate('/dashboard');  // Redirigir
 
     } catch (error) {
       console.error('Error en la autenticación:', error.response?.data || error);
@@ -69,4 +73,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

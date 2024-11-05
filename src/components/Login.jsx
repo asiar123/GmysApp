@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -12,6 +11,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const navigate = useNavigate();
   const { login } = useContext(UserContext); // Obtener el método login del contexto
 
@@ -75,14 +75,23 @@ const Login = () => {
             required
             disabled={loading}
           />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
+          <div className="input-group">
+            <input
+              type={showPassword ? 'text' : 'password'} // Toggle input type based on showPassword state
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+            >
+              {showPassword ? 'Ocultar' : 'Mostrar contraseña'}
+            </button>
+          </div>
           <button type="submit" disabled={loading}>
             {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>

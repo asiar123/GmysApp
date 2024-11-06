@@ -93,7 +93,7 @@ const CenterMap = ({ coordinates }) => {
   useEffect(() => {
     if (coordinates.length > 0) {
       const lastCoordinate = coordinates[coordinates.length - 1]; // Get the last coordinate
-      map.setView(lastCoordinate, 20); // Center the map at the last coordinate with a zoom level of 13
+      map.setView(lastCoordinate, 18); // Center the map at the last coordinate with a zoom level of 13
     }
   }, [coordinates, map]);
 
@@ -110,7 +110,7 @@ const lowSpeedIcon = L.divIcon({
 
 const highSpeedIcon = L.divIcon({
   className: "custom-high-speed-icon",
-  html: '<div style="background-color:green; width: 15px; height: 15px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:blue; width: 15px; height: 15px; border-radius: 50%;"></div>',
   iconSize: [15, 15],
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],
@@ -191,66 +191,81 @@ function Recorrido() {
     .map((punto) => extractCoordinates(punto.position))
     .filter(Boolean);
 
-  return (
-    <div className="recorrido-container">
-      <h1 className="text-2xl font-bold mb-4 text-center text-white">Recorrido del Vehículo {vehiId}</h1>
-      {/* Renderizar el mapa si el recorrido está disponible */}
-      {loading ? <p>Cargando...</p> : mostrarMapa && lineCoordinates.length > 0 && (
-        <MapContainer
-          key={vehiId}
-          center={lineCoordinates[0]}
-          zoom={13}
-          style={{ height: '500px', width: '100%' }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-          <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
-          <Polyline positions={lineCoordinates} color="blue" weight={3} />
-
-          // In your Recorrido component
-          {recorrido.map((punto, index) => {
-            const coordinates = extractCoordinates(punto.position);
-            const isFirstPoint = index === 0;
-            const isLastPoint = index === recorrido.length - 1;
-
-            if (coordinates) {
-              let markerIcon;
-
-              // Change the marker icon based on the speed
-              if (punto.velocidad <= 10) { // Example threshold for low speed
-                markerIcon = lowSpeedIcon;
-              } else {
-                markerIcon = highSpeedIcon;
-              }
-
-              return (
-                <Marker
-                  key={index}
-                  position={coordinates}
-                  icon={isFirstPoint ? startIcon : isLastPoint ? endIcon : markerIcon}
-                  zIndexOffset={isLastPoint ? 1000 : 0}
-                >
-                  <Popup>
-                    Velocidad: {parseFloat(punto.velocidad).toFixed(1)} km/h
-                    <br />
-                    Fecha: {formatFecha(punto.dia)}
-                    <br />
-                    Dirección: {punto.direccion || 'Cargando dirección...'}
-                  </Popup>
-                </Marker>
-              );
-            }
-            return null;
-          })}
-        </MapContainer>
-      )}
-
-      {loading && <div>Cargando recorrido...</div>}
-      {!loading && recorrido.length === 0 && mostrarMapa && <div className="text-2xl font-bold mb-4 text-center text-white">No hay datos de recorrido disponibles.</div>}
-    </div>
-  );
+    return (
+      <div className="recorrido-container">
+        <h1 className="text-2xl font-bold mb-4 text-center text-white">
+          Recorrido del Vehículo {vehiId}
+        </h1>
+        {/* Renderizar el mapa si el recorrido está disponible */}
+        {loading ? (
+          <p>Cargando...</p>
+        ) : (
+          mostrarMapa && lineCoordinates.length > 0 && (
+            <MapContainer
+              key={vehiId}
+              center={lineCoordinates[0]}
+              zoom={13}
+              style={{ height: '500px', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
+              <Polyline positions={lineCoordinates} color="blue" weight={3} />
+    
+              {/* In your Recorrido component */}
+              {recorrido.map((punto, index) => {
+                const coordinates = extractCoordinates(punto.position);
+                const isFirstPoint = index === 0;
+                const isLastPoint = index === recorrido.length - 1;
+    
+                if (coordinates) {
+                  let markerIcon;
+    
+                  // Change the marker icon based on the speed
+                  if (punto.velocidad <= 10) { // Example threshold for low speed
+                    markerIcon = lowSpeedIcon;
+                  } else {
+                    markerIcon = highSpeedIcon;
+                  }
+    
+                  return (
+                    <Marker
+                      key={index}
+                      position={coordinates}
+                      icon={isFirstPoint ? startIcon : isLastPoint ? endIcon : markerIcon}
+                      zIndexOffset={isFirstPoint ? 2000 : isLastPoint ? 1000 : 0}
+                    >
+                      <Popup>
+                        Velocidad: {parseFloat(punto.velocidad).toFixed(1)} km/h
+                        <br />
+                        Fecha: {formatFecha(punto.dia)}
+                        <br />
+                        Dirección: {punto.direccion || 'Cargando dirección...'}
+                      </Popup>
+                    </Marker>
+                  );
+                }
+                return null;
+              })}
+            </MapContainer>
+          )
+        )}
+    
+        {loading && (
+          <div className="text-2xl font-bold mb-4 text-center text-white">
+            Cargando recorrido...
+          </div>
+        )}
+        {!loading && recorrido.length === 0 && mostrarMapa && (
+          <div className="text-2xl font-bold mb-4 text-center text-white">
+            No hay datos de recorrido disponibles.
+          </div>
+        )}
+      </div>
+    );
+    
 }
 
 export default Recorrido;

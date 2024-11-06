@@ -1,39 +1,93 @@
-.reportes-container{
+.reportes-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    min-height: 100vh; /* Asegura que ocupe toda la pantalla */
-    background-color: #0A1F44;}
-
-.h1{
+    min-height: 100vh; /* Ensures full screen height */
+    background-color: #0A1F44;
     color: #ECF0F1;
 }
 
+.reportes-container h1 {
+    color: #ECF0F1;
+}
+
+/* Styling the table */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.table {
+    color: #ECF0F1;
+    background-color: #1B2A49;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #283B5B;
+}
+
+/* Pagination styling */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px; /* Adds space above the footer */
+}
+
+.pagination .page-item .page-link {
+    color: #ECF0F1;
+    background-color: #1B2A49;
+    border: 1px solid #3E4C72;
+    height: 50px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #3E4C72;
+    border-color: #3E4C72;
+}
+
+.pagination .page-item:hover .page-link {
+    background-color: #465B8A;
+}
+
+/* Ensure footer does not overlap with pagination */
+footer {
+    padding: 10px;
+    background-color: #073A56;
+    color: #ffffff;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .homepage-background {
-        padding-top: 4vh;
-        padding-bottom: 10vh;
-        background-size: cover; /* Adjust to cover smaller screens */
+    .reportes-container {
+        padding: 10px;
     }
 
-    .btn-iniciar {
-        padding: 12px 30px;
-        font-size: 1rem;
-        bottom: 80px; /* Adjust button position for smaller screens */
+    .table-responsive {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .pagination-container {
+        flex-wrap: wrap;
+        justify-content: space-around;
     }
 }
 
 @media (max-width: 480px) {
-    .homepage-background {
-        padding-top: 2vh;
-        padding-bottom: 8vh;
+    .reportes-container {
+        padding: 5px;
     }
 
-    .btn-iniciar {
-        padding: 10px 25px;
-        font-size: 0.9rem;
-        bottom: 60px;
+    .pagination-container {
+        flex-direction: column;
+        align-items: center;
     }
 }

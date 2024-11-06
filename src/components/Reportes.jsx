@@ -46,23 +46,23 @@ const Reportes = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`https://proxy-gmys.onrender.com/eventos_placa`, {
+      const response = await axios.get('https://proxy-gmys.onrender.com/vehiculo_recorrido', {
         params: {
           vehi_id: vehiId,
           fecha_i: fechaInicio,
           fecha_f: fechaFin,
         },
       });
-
+      console.log('Response: ',response);
       const recorridoData = response.data
         .filter((item) => item.position)
         .map((item) => {
           const [lat, lng] = item.position.replace(/[()]/g, '').split(',').map(Number);
           return {
-            fecha: item.fecha,
-            placa: item.placa,
+            dia: item.dia,
+            position: item.position,
             vehi_id: item.vehi_id,
-            descripcion: item.descripcion,
+            velocidad: item.velocidad,
             lat,
             lng,
           };
@@ -146,17 +146,17 @@ const Reportes = () => {
               <thead className="table-dark">
                 <tr>
                   <th className="text-center">Fecha</th>
-                  <th className="text-center">Placa</th>
-                  <th className="text-center">Descripción</th>
+                  <th className="text-center">Dirección</th>
+                  <th className="text-center">Velocidad km</th>
                   <th className="text-center">Posición (Lat, Lng)</th>
                 </tr>
               </thead>
               <tbody>
                 {displayedData.map((item, index) => (
                   <tr key={index}>
-                    <td className="text-center">{item.fecha}</td>
-                    <td className="text-center">{item.placa}</td>
-                    <td className="text-center">{item.descripcion}</td>
+                    <td className="text-center">{item.dia}</td>
+                    <td className="text-center">{item.position}</td>
+                    <td className="text-center">{item.velocidad}</td>
                     <td className="text-center">
                       <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
                         <i className="fas fa-map-marker-alt"></i> {/* Icono de marcador */}

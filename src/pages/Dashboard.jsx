@@ -4,7 +4,7 @@ import { getVehicles } from "../services/authService";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
 import iconoVerRecorrido from '../assets/custom_pin4.png';
-import locationGif from '../assets/searching.gif'; // Asegúrate de que la ruta sea correcta
+import locationGif from '../assets/searching.gif';
 
 function Dashboard() {
   const [data, setData] = useState([]);
@@ -43,9 +43,7 @@ function Dashboard() {
   function formatFecha(fecha) {
     if (!fecha) return 'Fecha no disponible';
 
-    // Reemplaza caracteres no estándar si es necesario
     const fechaNormalizada = fecha.replace(/_/g, ' ');
-
     const date = new Date(fechaNormalizada);
     if (isNaN(date.getTime())) return 'Fecha no disponible';
 
@@ -73,54 +71,53 @@ function Dashboard() {
           </div>
         </div>
       ) : (
-        <div className="card-container">
-          {data.length > 0 ? (
-            data.map((vehiculo) => (
-              <div key={vehiculo.vehi_id} className="vehicle-card horizontal">
-                <div className="card-body">
-                  <p className="velocidad">
-                    <span
-                      className={`status-indicator ${vehiculo.velocidad > 0 ? 'green' : 'red'}`}
-                      title={vehiculo.velocidad > 0 ? 'En movimiento' : 'Detenido'}
-                    ></span>
-                    {vehiculo.velocidad !== null
-                      ? `${vehiculo.velocidad.toFixed(1)} km/h`
-                      : 'Velocidad desconocida'}
-                  </p>
+        <div className="scrollable-container">
+          <div className="card-container">
+            {data.length > 0 ? (
+              data.map((vehiculo) => (
+                <div key={vehiculo.vehi_id} className="vehicle-card horizontal">
+                  <div className="card-body">
+                    <p className="velocidad">
+                      <span
+                        className={`status-indicator ${vehiculo.velocidad > 0 ? 'green' : 'red'}`}
+                        title={vehiculo.velocidad > 0 ? 'En movimiento' : 'Detenido'}
+                      ></span>
+                      {vehiculo.velocidad !== null
+                        ? `${vehiculo.velocidad.toFixed(1)} km/h`
+                        : 'Velocidad desconocida'}
+                    </p>
+                  </div>
+                  <div className="card-header">
+                    <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
+                  </div>
+                  <div className="card-body">
+                    <p className="ubicacion">{vehiculo.descripcion || 'Ubicación no disponible'}</p>
+                  </div>
+                  <div className="card-body">
+                    <p className="fecha">{formatFecha(vehiculo.fecha)}</p>
+                  </div>
+                  <div className="card-footer">
+                    <img
+                      src={iconoVerRecorrido}
+                      alt="Ver Recorrido"
+                      className="icono-ver-recorrido"
+                      onClick={() => handleVerRecorrido(vehiculo.vehi_id)}
+                    />
+                  </div>
                 </div>
-                <div className="card-header">
-                  <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
-                </div>
-                <div className="card-body">
-                <p className="ubicacion">{vehiculo.descripcion || 'Ubicación no disponible'}</p>
-                </div>
-                <div className="card-body">
-                  <p className="fecha">{formatFecha(vehiculo.fecha)}</p>
-                </div>
-                <div className="card-footer">
-                  <img
-                    src={iconoVerRecorrido}
-                    alt="Ver Recorrido"
-                    className="icono-ver-recorrido"
-                    onClick={() => handleVerRecorrido(vehiculo.vehi_id)}
-                  />
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-center">No se han cargado los datos aún.</p>
-          )}
+              ))
+            ) : (
+              <p className="text-center">No se han cargado los datos aún.</p>
+            )}
+          </div>
         </div>
-
       )}
 
-      {/* Agregar el GIF en la parte inferior */}
       <div className="gps-animation">
         <img src={locationGif} alt="GPS Animation" />
       </div>
     </div>
   );
-
 }
 
 export default Dashboard;

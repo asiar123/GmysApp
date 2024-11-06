@@ -109,6 +109,24 @@ th {
   margin-left: 10px;
 }
 
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #0A1F44;
+  overflow-y: auto; /* Enable scrolling for the entire dashboard */
+}
+
+.scrollable-container {
+  max-height: 60vh; /* Adjustable height for internal scrollable area */
+  overflow-y: auto;
+  width: 100%;
+  padding: 10px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .vehicle-card.horizontal {

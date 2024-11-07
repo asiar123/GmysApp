@@ -4,10 +4,15 @@
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    min-height: 100vh; /* Ensures full screen height */
+    min-height: 100vh;
     background-color: #0A1F44;
     color: #ECF0F1;
 }
+
+.custom-margin {
+  margin: 20px; /* Example margin */
+}
+
 
 .reportes-container h1 {
     color: #ECF0F1;
@@ -23,6 +28,21 @@
 .table {
     color: #ECF0F1;
     background-color: #1B2A49;
+    border-collapse: collapse;
+}
+
+.table th {
+    background-color: #00CFC1;
+    color: #ECF0F1;
+    border-bottom: 2px solid #3E4C72;
+    padding: 10px;
+    text-align: center;
+}
+
+.table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #3E4C72;
 }
 
 .table-hover tbody tr:hover {
@@ -34,14 +54,13 @@
     display: flex;
     justify-content: center;
     margin-top: 20px;
-    margin-bottom: 20px; /* Adds space above the footer */
+    margin-bottom: 20px;
 }
 
 .pagination .page-item .page-link {
     color: #ECF0F1;
     background-color: #1B2A49;
     border: 1px solid #3E4C72;
-    height: 50px;
 }
 
 .pagination .page-item.active .page-link {

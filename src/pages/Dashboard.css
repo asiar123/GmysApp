@@ -120,6 +120,11 @@ th {
   overflow-y: auto; /* Enable scrolling for the entire dashboard */
 }
 
+.custom-margin {
+  margin: 30px; /* Example margin */
+  color: #ffffff;
+}  
+
 .scrollable-container {
   max-height: 60vh; /* Adjustable height for internal scrollable area */
   overflow-y: auto;

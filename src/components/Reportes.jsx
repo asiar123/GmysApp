@@ -6,6 +6,7 @@ import { Table, Pagination } from 'react-bootstrap'; // Importamos componentes d
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './reportes.css';
 import { Link } from 'react-router-dom'; // Importa Link para manejar la redirección
+import { Spinner } from 'react-bootstrap'; // Import Bootstrap Spinner
 
 const Reportes = () => {
   const { usuarioId } = useContext(UserContext);
@@ -53,7 +54,7 @@ const Reportes = () => {
           fecha_f: fechaFin,
         },
       });
-      console.log('Response: ',response);
+      console.log('Response: ', response);
       const recorridoData = response.data
         .filter((item) => item.position)
         .map((item) => {
@@ -89,6 +90,7 @@ const Reportes = () => {
   return (
     <div className="reportes-container container mt-4">
       <form onSubmit={handleSubmit} className="mb-4">
+      <h2 className="text-center custom-margin">Reportes</h2> {/* Title added here */}
         <div className="row mb-3">
           <div className="col-md-4">
             <label className="form-label">Selecciona el Vehículo:</label>
@@ -106,7 +108,7 @@ const Reportes = () => {
               ))}
             </select>
           </div>
-  
+
           <div className="col-md-4">
             <label className="form-label">Fecha de Inicio:</label>
             <input
@@ -117,7 +119,7 @@ const Reportes = () => {
               required
             />
           </div>
-  
+
           <div className="col-md-4">
             <label className="form-label">Fecha de Fin:</label>
             <input
@@ -129,62 +131,70 @@ const Reportes = () => {
             />
           </div>
         </div>
-  
+
         <div className="text-center">
           <button type="submit" className="btn btn-primary">
             Ver Reporte
           </button>
         </div>
       </form>
-  
+
       {loading ? (
-        <p className="text-center">Cargando...</p>
+        <div className="text-center">
+          <Spinner animation="border" role="status" className="text-primary">
+            <span className="visually-hidden">Cargando...</span>
+          </Spinner>
+        </div>
       ) : (
         recorrido.length > 0 && (
           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-            <table className="table table-striped table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th className="text-center">Fecha</th>
-                  <th className="text-center">Dirección</th>
-                  <th className="text-center">Velocidad km</th>
-                  <th className="text-center">Posición (Lat, Lng)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="text-center">{item.dia}</td>
-                    <td className="text-center">{item.position}</td>
-                    <td className="text-center">{item.velocidad}</td>
-                    <td className="text-center">
-                      <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
-                        <i className="fas fa-map-marker-alt"></i> {/* Icono de marcador */}
-                      </Link>
-                    </td>
+            <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <table className="table table-striped table-bordered table-hover">
+                <thead className="table-dark">
+                  <tr>
+                    <th className="text-center">Fecha</th>
+                    <th className="text-center">Velocidad km</th>
+                    <th className="text-center">Posición</th>
+                    <th className="text-center">Posición (Lat, Lng)</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {displayedData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="text-center">{item.dia}</td>
+                      <td className="text-center">{item.velocidad}</td>
+                      <td className="text-center">{item.position}</td>
+                      <td className="text-center">
+                        <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
+                          <i className="fas fa-map-marker-alt"></i>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="pagination-container" >
+              {/* Paginación */}
+              <Pagination className="justify-content-center mt-3">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Pagination.Item
+                    key={i + 1}
+                    active={i + 1 === currentPage}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </Pagination.Item>
                 ))}
-              </tbody>
-            </table>
-  
-            {/* Paginación */}
-            <Pagination className="justify-content-center mt-3">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <Pagination.Item
-                  key={i + 1}
-                  active={i + 1 === currentPage}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </Pagination.Item>
-              ))}
-            </Pagination>
+              </Pagination>
+            </div>
           </div>
         )
       )}
     </div>
   );
-  
+
 
 };
 

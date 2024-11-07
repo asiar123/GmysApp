@@ -102,7 +102,7 @@ const CenterMap = ({ coordinates }) => {
 
 const lowSpeedIcon = L.divIcon({
   className: "custom-low-speed-icon",
-  html: '<div style="background-color:red; width: 15px; height: 15px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:#F39C12; width: 15px; height: 15px; border-radius: 50%;"></div>',
   iconSize: [15, 15],
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],

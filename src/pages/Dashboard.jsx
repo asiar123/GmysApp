@@ -62,7 +62,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="text-center mb-4">Mis Vehículos</h1>
+      <h1 className="text-center mb-4 custom-margin">Mis Vehículos</h1>
 
       {loading ? (
         <div className="text-center">

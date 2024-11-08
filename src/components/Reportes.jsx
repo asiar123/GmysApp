@@ -90,7 +90,7 @@ const Reportes = () => {
   return (
     <div className="reportes-container container mt-4">
       <form onSubmit={handleSubmit} className="mb-4">
-      <h2 className="text-center custom-margin">Reportes</h2> {/* Title added here */}
+        <h2 className="text-center custom-margin">Reportes</h2> {/* Title added here */}
         <div className="row mb-3">
           <div className="col-md-4">
             <label className="form-label">Selecciona el Vehículo:</label>
@@ -108,37 +108,39 @@ const Reportes = () => {
               ))}
             </select>
           </div>
-
-          <div className="col-md-4">
-            <label className="form-label">Fecha de Inicio:</label>
-            <input
-              type="date"
-              className="form-control"
-              value={fechaInicio}
-              onChange={(e) => setFechaInicio(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="col-md-4">
-            <label className="form-label">Fecha de Fin:</label>
-            <input
-              type="date"
-              className="form-control"
-              value={fechaFin}
-              onChange={(e) => setFechaFin(e.target.value)}
-              required
-            />
+  
+          <div className="row">
+            <div className="col-6 col-md-6 mb-3">
+              <label className="form-label">Fecha de Inicio:</label>
+              <input
+                type="date"
+                className="form-control"
+                value={fechaInicio}
+                onChange={(e) => setFechaInicio(e.target.value)}
+                required
+              />
+            </div>
+  
+            <div className="col-6 col-md-6 mb-3">
+              <label className="form-label">Fecha de Fin:</label>
+              <input
+                type="date"
+                className="form-control"
+                value={fechaFin}
+                onChange={(e) => setFechaFin(e.target.value)}
+                required
+              />
+            </div>
           </div>
         </div>
-
+  
         <div className="text-center">
           <button type="submit" className="btn btn-primary">
             Ver Reporte
           </button>
         </div>
       </form>
-
+  
       {loading ? (
         <div className="text-center">
           <Spinner animation="border" role="status" className="text-primary">
@@ -146,7 +148,7 @@ const Reportes = () => {
           </Spinner>
         </div>
       ) : (
-        recorrido.length > 0 && (
+        recorrido.length > 0 ? (
           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
             <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               <table className="table table-striped table-bordered table-hover">
@@ -174,8 +176,8 @@ const Reportes = () => {
                 </tbody>
               </table>
             </div>
-
-            <div className="pagination-container" >
+  
+            <div className="pagination-container">
               {/* Paginación */}
               <Pagination className="justify-content-center mt-3">
                 {Array.from({ length: totalPages }, (_, i) => (
@@ -190,10 +192,15 @@ const Reportes = () => {
               </Pagination>
             </div>
           </div>
+        ) : (
+          <div className="text-center">
+            <p>No se han encontrado reportes para las fechas seleccionadas.</p>
+          </div>
         )
       )}
     </div>
   );
+  
 
 
 };

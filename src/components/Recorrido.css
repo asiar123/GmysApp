@@ -6,11 +6,17 @@
     padding: 20px;
     box-sizing: border-box;
     min-height: 100vh; /* Asegura que ocupe toda la pantalla */
-    background-color: #0A1F44;}
+    background-color: #0A1F44;
+}
 
 .h1{
     color: #ECF0F1;
 }
+
+.custom-margin {
+    margin: 40px; /* Example margin */
+    color: #ffffff;
+  }  
 
 @media (max-width: 768px) {
     .homepage-background {

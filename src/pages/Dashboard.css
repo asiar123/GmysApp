@@ -121,8 +121,9 @@ th {
 }
 
 .custom-margin {
-  margin: 30px; /* Example margin */
+  margin: 70px; /* Example margin */
   color: #ffffff;
+  padding-top: 20px;
 }  
 
 .scrollable-container {

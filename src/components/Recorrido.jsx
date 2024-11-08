@@ -12,7 +12,7 @@ import './Recorrido.css'
 // Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
   className: "custom-start-icon",
-  html: '<div style="background-color:#1ABC9C; width: 20px; height: 20px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:#1ABC9C; width: 15px; height: 15px; border-radius: 50%;"></div>',
   iconSize: [20, 20],
   iconAnchor: [10, 10],
   popupAnchor: [0, -10],
@@ -21,7 +21,7 @@ const startIcon = L.divIcon({
 // Crear ícono de fin (vehículo con imagen personalizada)
 const endIcon = L.icon({
   iconUrl: carIcon,
-  iconSize: [50, 50], // Aumenta el tamaño del ícono para destacarlo
+  iconSize: [25, 25], // Aumenta el tamaño del ícono para destacarlo
   iconAnchor: [25, 25], // Centra el ícono
   popupAnchor: [0, -25],
 });
@@ -102,7 +102,7 @@ const CenterMap = ({ coordinates }) => {
 
 const lowSpeedIcon = L.divIcon({
   className: "custom-low-speed-icon",
-  html: '<div style="background-color:#F39C12; width: 15px; height: 15px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:#F39C12; width: 10px; height: 10px; border-radius: 50%;"></div>',
   iconSize: [15, 15],
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],
@@ -110,7 +110,7 @@ const lowSpeedIcon = L.divIcon({
 
 const highSpeedIcon = L.divIcon({
   className: "custom-high-speed-icon",
-  html: '<div style="background-color:blue; width: 15px; height: 15px; border-radius: 50%;"></div>',
+  html: '<div style="background-color:blue; width: 10px; height: 10px; border-radius: 50%;"></div>',
   iconSize: [15, 15],
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],
@@ -212,7 +212,7 @@ function Recorrido() {
                 attribution="&copy; OpenStreetMap contributors"
               />
               <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
-              <Polyline positions={lineCoordinates} color="blue" weight={3} />
+              <Polyline positions={lineCoordinates} color="blue" weight={1} />
     
               {/* In your Recorrido component */}
               {recorrido.map((punto, index) => {

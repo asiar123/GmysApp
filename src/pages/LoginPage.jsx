@@ -36,7 +36,7 @@ const LoginPage = () => {
 
       if (data.mensaje.usuario_id) {
         localStorage.setItem('usuario_id', data.mensaje.usuario_id);
-        console.log('ID de usuario guardado:', data.mensaje.usuario_id);
+        console.log('ID de usuario guardado LoginPage:', data.mensaje.usuario_id);
         login(data.mensaje.usuario_id, token);  // Actualizar el contexto de usuario
       }
 

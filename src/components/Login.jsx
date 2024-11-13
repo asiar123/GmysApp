@@ -42,7 +42,7 @@ const Login = () => {
       // Verificar y guardar el usuario_id en el contexto y en localStorage
       if (data.mensaje.usuario_id) {
         localStorage.setItem('usuario_id', data.mensaje.usuario_id);
-        console.log('ID de usuario guardado:', data.mensaje.usuario_id);
+        console.log('ID de usuario guardado Login:', data.mensaje.usuario_id);
 
         // Llamar al método login del contexto
         login(data.mensaje.usuario_id, token);

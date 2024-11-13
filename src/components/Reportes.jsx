@@ -2,11 +2,10 @@ import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
 import { getVehicles } from "../services/authService";
-import { Table, Pagination } from 'react-bootstrap'; // Importamos componentes de Bootstrap
+import { Table, Pagination, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './reportes.css';
-import { Link } from 'react-router-dom'; // Importa Link para manejar la redirección
-import { Spinner } from 'react-bootstrap'; // Import Bootstrap Spinner
+import { Link } from 'react-router-dom';
 
 const Reportes = () => {
   const { usuarioId } = useContext(UserContext);
@@ -17,6 +16,7 @@ const Reportes = () => {
   const [recorrido, setRecorrido] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [addresses, setAddresses] = useState({}); // New state to cache addresses
 
   useEffect(() => {
     const fetchVehiculos = async () => {
@@ -54,7 +54,6 @@ const Reportes = () => {
           fecha_f: fechaFin,
         },
       });
-      console.log('Response: ', response);
       const recorridoData = response.data
         .filter((item) => item.position)
         .map((item) => {
@@ -78,7 +77,40 @@ const Reportes = () => {
     }
   };
 
-  // Configuración de paginación
+  // Fetch address based on coordinates
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+        params: {
+          lat,
+          lon: lng,
+          format: 'json',
+        },
+      });
+      return response.data.display_name;
+    } catch (error) {
+      console.error('Error fetching address:', error);
+      return 'Dirección no encontrada';
+    }
+  };
+
+  // Fetch addresses for displayed coordinates
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      const newAddresses = { ...addresses };
+      for (const item of displayedData) {
+        const key = `${item.lat},${item.lng}`;
+        if (!addresses[key]) {
+          newAddresses[key] = await fetchAddress(item.lat, item.lng);
+        }
+      }
+      setAddresses(newAddresses);
+    };
+    
+    fetchAddresses();
+  }, [recorrido, currentPage]);
+
+  // Pagination setup
   const itemsPerPage = 25;
   const totalPages = Math.ceil(recorrido.length / itemsPerPage);
   const displayedData = recorrido.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -90,7 +122,7 @@ const Reportes = () => {
   return (
     <div className="reportes-container container mt-4">
       <form onSubmit={handleSubmit} className="mb-4">
-        <h2 className="text-center custom-margin">Reportes</h2> {/* Title added here */}
+        <h2 className="text-center custom-margin">Reportes</h2>
         <div className="row mb-3">
           <div className="col-md-4">
             <label className="form-label">Selecciona el Vehículo:</label>
@@ -165,10 +197,12 @@ const Reportes = () => {
                     <tr key={index}>
                       <td className="text-center">{item.dia}</td>
                       <td className="text-center">{item.velocidad}</td>
-                      <td className="text-center">{item.position}</td>
+                      <td className="text-center">
+                        {addresses[`${item.lat},${item.lng}`] || 'Cargando...'}
+                      </td>
                       <td className="text-center">
                         <Link to={`/posicion/${item.lat}/${item.lng}`} className="position-link">
-                          <i className="fas fa-map-marker-alt"></i>
+                          <i className="fas fa-map-marker-alt"></i> {`(${item.lat}, ${item.lng})`}
                         </Link>
                       </td>
                     </tr>
@@ -178,7 +212,6 @@ const Reportes = () => {
             </div>
   
             <div className="pagination-container">
-              {/* Paginación */}
               <Pagination className="justify-content-center mt-3">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <Pagination.Item
@@ -200,9 +233,6 @@ const Reportes = () => {
       )}
     </div>
   );
-  
-
-
 };
 
 export default Reportes;

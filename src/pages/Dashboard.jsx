@@ -17,7 +17,15 @@ function Dashboard() {
       try {
         const response = await getVehicles(usuarioId);
         if (Array.isArray(response)) {
-          setData(response);
+          const vehiclesWithAddresses = await Promise.all(response.map(async (vehiculo) => {
+            if (vehiculo.position) {
+              const [lat, lng] = vehiculo.position.replace(/[()]/g, '').split(',');
+              const address = await fetchAddressFromCoordinates(lat, lng);
+              return { ...vehiculo, ubicacion: address || 'Ubicación no disponible' };
+            }
+            return { ...vehiculo, ubicacion: 'Ubicación no disponible' };
+          }));
+          setData(vehiclesWithAddresses);
         } else {
           console.error('La respuesta no es un array:', response);
         }
@@ -35,6 +43,17 @@ function Dashboard() {
       setLoading(false);
     }
   }, [usuarioId]);
+
+  const fetchAddressFromCoordinates = async (lat, lng) => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+      const data = await response.json();
+      return data.display_name || null;
+    } catch (error) {
+      console.error('Error al obtener la dirección:', error);
+      return null;
+    }
+  };
 
   const handleVerRecorrido = (vehiId) => {
     navigate(`/recorrido/${vehiId}`);
@@ -91,7 +110,7 @@ function Dashboard() {
                     <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
                   </div>
                   <div className="card-body">
-                    <p className="ubicacion">{vehiculo.descripcion || 'Ubicación no disponible'}</p>
+                    <p className="ubicacion">{vehiculo.ubicacion}</p>
                   </div>
                   <div className="card-body">
                     <p className="fecha">{formatFecha(vehiculo.fecha)}</p>

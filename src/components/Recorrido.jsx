@@ -8,6 +8,7 @@ import './Recorrido.css';
 import carIcon from '../assets/car_thicker_bubble.png';
 import { useMap } from 'react-leaflet';
 import './Recorrido.css'
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 // Crear ícono de inicio (punto rojo)
 const startIcon = L.divIcon({
@@ -34,6 +35,16 @@ const customPin = L.divIcon({
   iconAnchor: [7.5, 7.5],
   popupAnchor: [0, -7.5],
 });
+
+// Crear ícono para vehículos estacionados (por ejemplo, punto gris)
+const parkedIcon = L.divIcon({
+  className: "custom-parked-icon",
+  html: '<div style="background-color:gray; width: 15px; height: 15px; border-radius: 50%;"></div>',
+  iconSize: [15, 15],
+  iconAnchor: [7.5, 7.5],
+  popupAnchor: [0, -7.5],
+});
+
 
 // Objeto de caché para almacenar coordenadas y direcciones
 const direccionCache = {};
@@ -155,6 +166,8 @@ function Recorrido() {
         },
       });
 
+      console.log('LO que viene: ', response);
+
       const data = response.data;
       if (Array.isArray(data)) {
         const puntosValidos = await Promise.all(data.map(async (punto) => {
@@ -214,22 +227,21 @@ function Recorrido() {
               <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
               <Polyline positions={lineCoordinates} color="blue" weight={1} />
     
-              {/* In your Recorrido component */}
+              <MarkerClusterGroup>
               {recorrido.map((punto, index) => {
                 const coordinates = extractCoordinates(punto.position);
                 const isFirstPoint = index === 0;
                 const isLastPoint = index === recorrido.length - 1;
-    
+
                 if (coordinates) {
-                  let markerIcon;
-    
-                  // Change the marker icon based on the speed
-                  if (punto.velocidad <= 10) { // Example threshold for low speed
+                  let markerIcon = highSpeedIcon;
+
+                  if (punto.velocidad === 0) {
+                    markerIcon = parkedIcon;
+                  } else if (punto.velocidad <= 10) {
                     markerIcon = lowSpeedIcon;
-                  } else {
-                    markerIcon = highSpeedIcon;
                   }
-    
+
                   return (
                     <Marker
                       key={index}
@@ -249,6 +261,8 @@ function Recorrido() {
                 }
                 return null;
               })}
+            </MarkerClusterGroup>
+
             </MapContainer>
           )
         )}

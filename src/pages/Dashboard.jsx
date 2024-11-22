@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getVehicles } from "../services/authService";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,57 +11,75 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const usuarioId = localStorage.getItem('usuario_id');
+  const addressCache = new Map(); // Para caché de direcciones
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const response = await getVehicles(usuarioId);
-        if (Array.isArray(response)) {
-          const vehiclesWithAddresses = await Promise.all(response.map(async (vehiculo) => {
-            if (vehiculo.position) {
-              const [lat, lng] = vehiculo.position.replace(/[()]/g, '').split(',');
-              const address = await fetchAddressFromCoordinates(lat, lng);
-              return { ...vehiculo, ubicacion: address || 'Ubicación no disponible' };
-            }
-            return { ...vehiculo, ubicacion: 'Ubicación no disponible' };
-          }));
-          setData(vehiclesWithAddresses);
-        } else {
-          console.error('La respuesta no es un array:', response);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error al obtener los datos:', error.message || error);
-        setLoading(false);
-      }
-    };
-
-    if (usuarioId) {
-      fetchVehicles();
-    } else {
-      console.error('Usuario ID no encontrado en localStorage');
-      setLoading(false);
+  // Función reutilizable para obtener direcciones desde coordenadas
+  const fetchAddressFromCoordinates = useCallback(async (lat, lng) => {
+    const key = `${lat},${lng}`;
+    if (addressCache.has(key)) {
+      return addressCache.get(key); // Usar caché si está disponible
     }
-  }, [usuarioId]);
-
-  const fetchAddressFromCoordinates = async (lat, lng) => {
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      );
       const data = await response.json();
-      return data.display_name || null;
+      const address = data.display_name || 'Ubicación no disponible';
+      addressCache.set(key, address); // Guardar en caché
+      return address;
     } catch (error) {
       console.error('Error al obtener la dirección:', error);
-      return null;
+      return 'Ubicación no disponible';
     }
+  }, []);
+
+  // Función para cargar vehículos
+  const fetchVehicles = useCallback(async () => {
+    if (!usuarioId) {
+      console.error('Usuario ID no encontrado en localStorage');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await getVehicles(usuarioId);
+      if (!Array.isArray(response)) {
+        console.error('La respuesta no es un array:', response);
+        setLoading(false);
+        return;
+      }
+
+      const vehiclesWithAddresses = await Promise.all(
+        response.map(async (vehiculo) => {
+          if (vehiculo.position) {
+            const [lat, lng] = vehiculo.position.replace(/[()]/g, '').split(',');
+            const address = await fetchAddressFromCoordinates(lat, lng);
+            return { ...vehiculo, ubicacion: address };
+          }
+          return { ...vehiculo, ubicacion: 'Ubicación no disponible' };
+        })
+      );
+
+      setData(vehiclesWithAddresses);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error.message || error);
+    } finally {
+      setLoading(false);
+    }
+  }, [usuarioId, fetchAddressFromCoordinates]);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
+
+  const handleVerRecorrido = (vehiId, vehiPlaca) => {
+    localStorage.setItem('lastVehiclePlaca', vehiPlaca); // Guardar la placa en localStorage
+    console.log('ID:', vehiId, 'Placa:', vehiPlaca); // Verifica que los valores sean correctos
+    navigate(`/recorrido/${vehiId}`, { state: { placa: vehiPlaca } }); // Enviar la placa en el estado
   };
 
-  const handleVerRecorrido = (vehiId) => {
-    navigate(`/recorrido/${vehiId}`);
-  };
-
-  function formatFecha(fecha) {
+  const formatFecha = (fecha) => {
     if (!fecha) return 'Fecha no disponible';
-
     const fechaNormalizada = fecha.replace(/_/g, ' ');
     const date = new Date(fechaNormalizada);
     if (isNaN(date.getTime())) return 'Fecha no disponible';
@@ -77,7 +95,7 @@ function Dashboard() {
     });
 
     return `${formattedDate} ${formattedTime}`;
-  }
+  };
 
   return (
     <div className="dashboard-container">
@@ -93,8 +111,11 @@ function Dashboard() {
         <div className="scrollable-container">
           <div className="card-container">
             {data.length > 0 ? (
-              data.map((vehiculo) => (
+              data.map((vehiculo) => ( 
                 <div key={vehiculo.vehi_id} className="vehicle-card horizontal">
+                  <div className="card-header">
+                    <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
+                  </div>
                   <div className="card-body">
                     <p className="velocidad">
                       <span
@@ -105,14 +126,7 @@ function Dashboard() {
                         ? `${vehiculo.velocidad.toFixed(1)} km/h`
                         : 'Velocidad desconocida'}
                     </p>
-                  </div>
-                  <div className="card-header">
-                    <span className="placa">{vehiculo.vehi_placa || 'Sin placa'}</span>
-                  </div>
-                  <div className="card-body">
                     <p className="ubicacion">{vehiculo.ubicacion}</p>
-                  </div>
-                  <div className="card-body">
                     <p className="fecha">{formatFecha(vehiculo.fecha)}</p>
                   </div>
                   <div className="card-footer">
@@ -120,7 +134,8 @@ function Dashboard() {
                       src={iconoVerRecorrido}
                       alt="Ver Recorrido"
                       className="icono-ver-recorrido"
-                      onClick={() => handleVerRecorrido(vehiculo.vehi_id)}
+                      aria-label={`Ver recorrido del vehículo ${vehiculo.vehi_placa}`}
+                      onClick={() => handleVerRecorrido(vehiculo.vehi_id, vehiculo.vehi_placa)} // Pasa ID y placa
                     />
                   </div>
                 </div>

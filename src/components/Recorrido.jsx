@@ -134,6 +134,7 @@ function Recorrido() {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [mostrarMapa, setMostrarMapa] = useState(false);
+  const placa = location.state?.placa || localStorage.getItem('lastVehiclePlaca') || 'Placa no disponible';
 
   // Configurar la fecha actual al cargar el componente
   useEffect(() => {
@@ -204,49 +205,92 @@ function Recorrido() {
     .map((punto) => extractCoordinates(punto.position))
     .filter(Boolean);
 
-    return (
-      <div className="recorrido-container">
-        <h1 className="text-2xl font-bold mb-4 text-center text-white">
-          Recorrido del Vehículo {vehiId}
-        </h1>
-        {/* Renderizar el mapa si el recorrido está disponible */}
-        {loading ? (
-          <p>Cargando...</p>
-        ) : (
-          mostrarMapa && lineCoordinates.length > 0 && (
-            <MapContainer
-              key={vehiId}
-              center={lineCoordinates[0]}
-              zoom={13}
-              style={{ height: '500px', width: '100%' }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-              <CenterMap coordinates={lineCoordinates} /> {/* Center the map on the route */}
-              <Polyline positions={lineCoordinates} color="blue" weight={1} />
-    
-              <MarkerClusterGroup>
-              {recorrido.map((punto, index) => {
+    console.log('Estado recibido en Recorrido:', location.state); // Verifica si la placa llega
+
+
+  return (
+  <div className="recorrido-container">
+    <h1 className="text-2xl font-bold mb-4 text-center text-white">
+      Recorrido del Vehículo {placa}
+    </h1>
+    {loading ? (
+      <p>Cargando...</p>
+    ) : (
+      mostrarMapa && lineCoordinates.length > 0 && (
+        <MapContainer
+          key={vehiId}
+          center={lineCoordinates[0]}
+          zoom={13}
+          style={{ height: '500px', width: '100%' }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
+          />
+          <CenterMap coordinates={lineCoordinates} />
+          <Polyline positions={lineCoordinates} color="blue" weight={1} />
+
+          <MarkerClusterGroup>
+            {recorrido
+              .filter((punto, index, array) => {
+                const isFirstPoint = index === 0;
+                const isLastPoint = index === array.length - 1;
+
+                // Siempre incluir el primer y último punto
+                if (isFirstPoint || isLastPoint) return true;
+
+                // Mantener puntos donde la velocidad cambia significativamente
+                const prevPunto = array[index - 1];
+                const velocidadChange = Math.abs(punto.velocidad - prevPunto.velocidad);
+
+                // Considerar un cambio significativo en posición o velocidad
+                const MIN_VELOCIDAD_CHANGE = 5; // Diferencia mínima de velocidad
+                const MIN_DISTANCIA_CHANGE = 0.0001; // Cambios pequeños en posición
+
+                const prevCoords = extractCoordinates(prevPunto.position);
+                const currentCoords = extractCoordinates(punto.position);
+
+                if (
+                  velocidadChange >= MIN_VELOCIDAD_CHANGE ||
+                  (prevCoords &&
+                    currentCoords &&
+                    (Math.abs(prevCoords[0] - currentCoords[0]) >= MIN_DISTANCIA_CHANGE ||
+                      Math.abs(prevCoords[1] - currentCoords[1]) >= MIN_DISTANCIA_CHANGE))
+                ) {
+                  return true;
+                }
+
+                return false;
+              })
+              .map((punto, index, array) => {
                 const coordinates = extractCoordinates(punto.position);
                 const isFirstPoint = index === 0;
-                const isLastPoint = index === recorrido.length - 1;
+                const isLastPoint = index === array.length - 1;
 
                 if (coordinates) {
-                  let markerIcon = highSpeedIcon;
-
-                  if (punto.velocidad === 0) {
-                    markerIcon = parkedIcon;
-                  } else if (punto.velocidad <= 10) {
-                    markerIcon = lowSpeedIcon;
-                  }
+                  const markerIcon = isFirstPoint
+                    ? startIcon
+                    : isLastPoint
+                    ? endIcon
+                    : L.divIcon({
+                        className: "custom-numbered-icon",
+                        html: `<div style="background-color: ${
+                          punto.velocidad === 0 ? "gray" : punto.velocidad <= 10 ? "#F39C12" : "blue"
+                        };
+                          width: 20px; height: 20px; border-radius: 50%; color: white; display: flex; align-items: center; 
+                          justify-content: center; font-weight: bold;">
+                          ${index + 1}
+                        </div>`,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10],
+                        popupAnchor: [0, -10],
+                      });
 
                   return (
                     <Marker
                       key={index}
                       position={coordinates}
-                      icon={isFirstPoint ? startIcon : isLastPoint ? endIcon : markerIcon}
+                      icon={markerIcon}
                       zIndexOffset={isFirstPoint ? 2000 : isLastPoint ? 1000 : 0}
                     >
                       <Popup>
@@ -254,32 +298,32 @@ function Recorrido() {
                         <br />
                         Fecha: {formatFecha(punto.dia)}
                         <br />
-                        Dirección: {punto.direccion || 'Cargando dirección...'}
+                        Dirección: {punto.direccion || "Cargando dirección..."}
                       </Popup>
                     </Marker>
                   );
                 }
                 return null;
               })}
-            </MarkerClusterGroup>
+          </MarkerClusterGroup>
+        </MapContainer>
+      )
+    )}
 
-            </MapContainer>
-          )
-        )}
-    
-        {loading && (
-          <div className="text-2xl font-bold mb-4 text-center text-white">
-            Cargando recorrido...
-          </div>
-        )}
-        {!loading && recorrido.length === 0 && mostrarMapa && (
-          <div className="text-2xl font-bold mb-4 text-center text-white">
-            No hay datos de recorrido disponibles.
-          </div>
-        )}
+    {loading && (
+      <div className="text-2xl font-bold mb-4 text-center text-white">
+        Cargando recorrido...
       </div>
-    );
-    
+    )}
+    {!loading && recorrido.length === 0 && mostrarMapa && (
+      <div className="text-2xl font-bold mb-4 text-center text-white">
+        No hay datos de recorrido disponibles.
+      </div>
+    )}
+  </div>
+);
+
+
 }
 
 export default Recorrido;

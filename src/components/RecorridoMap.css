@@ -1,0 +1,124 @@
+/* Contenedor para los botones */
+.botones-container {
+  position: fixed; /* Fijo para que siempre esté visible */
+  bottom: 20px; /* Distancia desde la parte inferior */
+  right: 10px; /* Distancia desde la parte derecha */
+  display: flex; /* Organizar los botones en fila */
+  gap: 10px; /* Separación entre los botones */
+  z-index: 1000; /* Encima de otros elementos */
+}
+
+/* Botón para ir a la última posición */
+.ir-a-ultima-posicion-btn {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Botón circular */
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ir-a-ultima-posicion-btn:hover {
+  background-color: #16a085;
+}
+
+.ir-a-primera-posicion-btn {
+  position: fixed;
+  bottom: 80px; /* Ajusta según sea necesario */
+  left: 20px; /* Posición en relación al botón de última posición */
+  background-color: #f1c40f;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Forma circular */
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ir-a-primera-posicion-btn:hover {
+  background-color: #d4ac0d;
+}
+
+
+/* Botón para reproducir el recorrido */
+.ir-a-inicio-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Botón circular */
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ir-a-inicio-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Barra de progreso */
+.progreso-barra {
+  position: fixed;
+  bottom: 90px; /* Espaciado por encima de los botones */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%; /* Ocupa casi todo el ancho */
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progreso-barra .progreso {
+  height: 100%;
+  background-color: #3498db;
+  width: 0%; /* Ancho inicial */
+  transition: width 0.5s ease;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+  .botones-container {
+    bottom: 10px; /* Más cercano al borde */
+    right: 10px;
+    margin: 200px;
+  }
+
+  .ir-a-ultima-posicion-btn,
+  .ir-a-inicio-btn {
+    width: 45px; /* Tamaño más pequeño */
+    height: 45px; /* Tamaño más pequeño */
+    font-size: 16px;
+  }
+
+  .progreso-barra {
+    bottom: 80px;
+    width: 85%; /* Más estrecha para pantallas pequeñas */
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

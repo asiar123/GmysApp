@@ -7,6 +7,85 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './reportes.css';
 import { Link } from 'react-router-dom';
 
+// Función para validar y corregir el formato de la fecha
+const fixDateFormat = (dateString) => {
+  if (!dateString || typeof dateString !== 'string') {
+    console.error('Fecha inválida o no definida:', dateString);
+    return null; // Retorna null si la fecha no es válida
+  }
+
+  // Reemplazar "_" por espacio
+  let [datePart, timePart] = dateString.split('_');
+  
+  if (!timePart) {
+    console.error('Formato de fecha incompleto:', dateString);
+    return null;
+  }
+
+  // Asegurar que los segmentos de tiempo tengan ceros iniciales
+  const timeSegments = timePart.split(':').map((segment) => segment.padStart(2, '0'));
+  const fixedTime = timeSegments.join(':');
+
+  return `${datePart} ${fixedTime}`;
+};
+
+// Función para calcular promedios de tiempo encendido y apagado
+const calculateAverages = (data) => {
+  if (!data || data.length < 2) {
+    return { averageOnTime: 0, averageOffTime: 0 };
+  }
+
+  let totalOnTime = 0; // Tiempo total encendido (en minutos)
+  let totalOffTime = 0; // Tiempo total apagado (en minutos)
+
+  for (let i = 1; i < data.length; i++) {
+    const current = data[i - 1];
+    const next = data[i];
+
+    // Validar y corregir las fechas
+    const currentDateString = fixDateFormat(current.dia);
+    const nextDateString = fixDateFormat(next.dia);
+
+    // Ignorar datos con fechas inválidas
+    if (!currentDateString || !nextDateString) {
+      console.error('Fechas no procesadas:', current, next);
+      continue;
+    }
+
+    const currentDate = new Date(currentDateString);
+    const nextDate = new Date(nextDateString);
+
+    if (isNaN(currentDate) || isNaN(nextDate)) {
+      console.error('Fechas no convertibles a Date:', currentDateString, nextDateString);
+      continue;
+    }
+
+    // Calcular la diferencia en minutos
+    const diff = (nextDate - currentDate) / 1000 / 60;
+
+    if (current.velocidad > 0) {
+      totalOnTime += diff;
+    } else {
+      totalOffTime += diff;
+    }
+  }
+
+  // Verificar que la suma total coincida con el intervalo completo
+  const firstDate = new Date(fixDateFormat(data[0].dia));
+  const lastDate = new Date(fixDateFormat(data[data.length - 1].dia));
+  const totalInterval = (lastDate - firstDate) / 1000 / 60; // Total en minutos
+
+  console.log('Tiempo total calculado (minutos):', totalOnTime + totalOffTime);
+  console.log('Tiempo total esperado (minutos):', totalInterval);
+
+  // Calcular promedios
+  const averageOnTime = totalOnTime.toFixed(2);
+  const averageOffTime = totalOffTime.toFixed(2);
+
+  return { averageOnTime, averageOffTime };
+};
+
+
 const Reportes = () => {
   const { usuarioId } = useContext(UserContext);
   const [vehiculos, setVehiculos] = useState([]);
@@ -19,7 +98,7 @@ const Reportes = () => {
   const [addresses, setAddresses] = useState({});
   const [formVisible, setFormVisible] = useState(true);
 
-  // Function to format the date for better readability
+  // Función para formatear la fecha de manera legible
   const formatDateTime = (dateString) => {
     if (!dateString.includes('_')) return 'Fecha inválida';
     const [date, time] = dateString.split('_');
@@ -56,7 +135,7 @@ const Reportes = () => {
     }
 
     setLoading(true);
-    setFormVisible(false); // Hide the form after submission
+    setFormVisible(false); // Oculta el formulario después del envío
     try {
       const response = await axios.get('https://proxy-gmys.onrender.com/vehiculo_recorrido', {
         params: {
@@ -73,7 +152,7 @@ const Reportes = () => {
             dia: item.dia,
             position: item.position,
             vehi_id: item.vehi_id,
-            velocidad: item.velocidad,
+            velocidad: item.velocidad || 0,
             lat,
             lng,
           };
@@ -89,13 +168,24 @@ const Reportes = () => {
   };
 
   const handleResetForm = () => {
-    setFormVisible(true); // Show the form when the reset button is clicked
+    setFormVisible(true);
     setRecorrido([]);
   };
 
   const itemsPerPage = 25;
   const totalPages = Math.ceil(recorrido.length / itemsPerPage);
   const displayedData = recorrido.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const averages = calculateAverages(recorrido);
+
+  // Verificación de datos
+  useEffect(() => {
+    console.log('Datos de recorrido:', recorrido.map((item) => fixDateFormat(item.dia)));
+  }, [recorrido]);
+
+  console.log('Datos procesados:', recorrido);
+console.log('Promedio de tiempo encendido (min):', averages.averageOnTime);
+console.log('Promedio de tiempo apagado (min):', averages.averageOffTime);
+
 
   return (
     <div className="reportes-container container mt-4">
@@ -162,7 +252,7 @@ const Reportes = () => {
         </div>
       ) : (
         recorrido.length > 0 && (
-          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+          <div className="table-container">
             <div className="table-responsive">
               <table className="table table-striped table-bordered table-hover">
                 <thead className="table-dark">
@@ -186,6 +276,14 @@ const Reportes = () => {
                       </td>
                     </tr>
                   ))}
+                  <tr>
+                    <td className="text-center" colSpan="2">Promedio de tiempo encendido (min)</td>
+                    <td className="text-center" colSpan="2">{averages.averageOnTime}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-center" colSpan="2">Promedio de tiempo apagado (min)</td>
+                    <td className="text-center" colSpan="2">{averages.averageOffTime}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>

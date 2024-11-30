@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Marker, Popup } from "react-leaflet";
 import axios from "axios";
+import L from "leaflet"; // Ensure Leaflet is properly imported
 
 // Helper function to calculate distance between two coordinates
 const calculateDistance = ([lat1, lon1], [lat2, lon2]) => {
@@ -68,28 +69,59 @@ const useGeocodeAddresses = (recorrido, extractCoordinates) => {
   return addresses;
 };
 
+// Function to aggregate stationary points
+const aggregateStationaryPoints = (recorrido, extractCoordinates) => {
+  const aggregatedPoints = [];
+  let currentCluster = [];
+  let previousCoordinates = null;
+
+  recorrido.forEach((punto, index) => {
+    const coordinates = extractCoordinates(punto.position);
+    if (!coordinates) return;
+
+    if (previousCoordinates) {
+      const distance = calculateDistance(previousCoordinates, coordinates);
+      if (distance < MIN_DISTANCE && punto.velocidad === 0) {
+        // Add to current cluster if within distance threshold and speed is 0
+        currentCluster.push(punto);
+        return;
+      }
+    }
+
+    // Finalize the current cluster if it exists
+    if (currentCluster.length > 0) {
+      aggregatedPoints.push({
+        ...currentCluster[0], // Use the first point's data
+        duration: currentCluster.length, // Add duration (number of points in cluster)
+      });
+    }
+
+    // Start a new cluster
+    currentCluster = [punto];
+    previousCoordinates = coordinates;
+  });
+
+  // Add the last cluster
+  if (currentCluster.length > 0) {
+    aggregatedPoints.push({
+      ...currentCluster[0],
+      duration: currentCluster.length,
+    });
+  }
+
+  return aggregatedPoints;
+};
+
 // Main CustomMarkers component
 const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }) => {
   const addresses = useGeocodeAddresses(recorrido, extractCoordinates);
 
-  // Filter redundant or stationary points
-  const filteredRecorrido = recorrido.filter((punto, index, array) => {
-    const coordinates = extractCoordinates(punto.position);
-    const prevCoordinates =
-      index > 0 ? extractCoordinates(array[index - 1].position) : null;
-
-    // Include points only if they are sufficiently far apart
-    if (prevCoordinates && coordinates) {
-      const distance = calculateDistance(prevCoordinates, coordinates);
-      return distance >= MIN_DISTANCE;
-    }
-
-    return true; // Always include the first point
-  });
+  // Aggregate stationary points
+  const aggregatedRecorrido = aggregateStationaryPoints(recorrido, extractCoordinates);
 
   return (
     <>
-      {filteredRecorrido.map((punto, index) => {
+      {aggregatedRecorrido.map((punto, index) => {
         const coordinates = extractCoordinates(punto.position);
         const isFirstPoint = index === 0;
 
@@ -122,11 +154,14 @@ const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }
                       marginRight: "5px",
                     }}
                   ></div>
-                  <strong>Reporte:</strong> {index + 1} / {filteredRecorrido.length}
+                  <strong>Reporte:</strong> {index + 1} / {aggregatedRecorrido.length}
                   <br />
                   <strong>Velocidad:</strong> {parseFloat(punto.velocidad).toFixed(1)} km/h
                   <br />
                   <strong>Fecha:</strong> {formatFecha(punto.dia)}
+                  <br />
+                  <strong>Duración:</strong>{" "}
+                  {punto.duration ? `${punto.duration} reportes` : "N/A"}
                   <br />
                   <strong>Dirección:</strong> {addresses[index] || "Cargando dirección..."}
                 </div>

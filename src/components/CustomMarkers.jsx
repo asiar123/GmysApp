@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Marker, Popup } from "react-leaflet";
 import axios from "axios";
-import L from "leaflet"; // Ensure Leaflet is properly imported
+import L from "leaflet";
 
-// Helper function to calculate distance between two coordinates
+// Helper function to calculate distance
 const calculateDistance = ([lat1, lon1], [lat2, lon2]) => {
-  const R = 6371e3; // Earth's radius in meters
+  const R = 6371e3;
   const toRadians = (deg) => (deg * Math.PI) / 180;
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
@@ -16,17 +16,18 @@ const calculateDistance = ([lat1, lon1], [lat2, lon2]) => {
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in meters
+  return R * c;
 };
 
-const MIN_DISTANCE = 5; // Minimum distance to consider movement (in meters)
+const MIN_DISTANCE = 5;
 
-// Custom hook for fetching addresses
-const useGeocodeAddresses = (recorrido, extractCoordinates) => {
+const useGeocodeAddresses = (recorrido, extractCoordinates, setLoadingAddresses) => {
   const [addresses, setAddresses] = useState([]);
 
   useEffect(() => {
     const fetchAllAddresses = async () => {
+      setLoadingAddresses(true);
+
       const uniqueCoordinates = Array.from(
         new Set(
           recorrido.map((punto) => {
@@ -36,7 +37,11 @@ const useGeocodeAddresses = (recorrido, extractCoordinates) => {
         )
       ).filter((coord) => coord);
 
-      if (uniqueCoordinates.length === 0) return;
+      if (uniqueCoordinates.length === 0) {
+        setAddresses([]);
+        setLoadingAddresses(false);
+        return;
+      }
 
       try {
         const response = await axios.post("https://proxy-gmys.onrender.com/batch-geocode", {
@@ -46,12 +51,17 @@ const useGeocodeAddresses = (recorrido, extractCoordinates) => {
           }),
         });
 
-        const addressMap = response.data; // Map { "lat,lon": "address" }
-        const fetchedAddresses = recorrido.map((punto) => {
+        const addressMap = response.data;
+        const fetchedAddresses = recorrido.map((punto, i) => {
           const coordinates = extractCoordinates(punto.position);
           if (coordinates) {
             const key = `${coordinates[0]},${coordinates[1]}`;
-            return addressMap[key] || "Dirección no disponible";
+            if (addressMap[key]) {
+              return addressMap[key];
+            } else {
+              console.warn(`No se encontró dirección para el índice ${i}: ${key}`);
+              return "Dirección no disponible";
+            }
           }
           return "Dirección no disponible";
         });
@@ -60,48 +70,45 @@ const useGeocodeAddresses = (recorrido, extractCoordinates) => {
       } catch (error) {
         console.error("Error fetching addresses:", error.message);
         setAddresses(recorrido.map(() => "Error al cargar dirección"));
+      } finally {
+        setLoadingAddresses(false);
       }
     };
 
     fetchAllAddresses();
-  }, [recorrido, extractCoordinates]);
+  }, [recorrido, extractCoordinates, setLoadingAddresses]);
 
   return addresses;
 };
 
-// Function to aggregate stationary points
 const aggregateStationaryPoints = (recorrido, extractCoordinates) => {
   const aggregatedPoints = [];
   let currentCluster = [];
   let previousCoordinates = null;
 
-  recorrido.forEach((punto, index) => {
+  recorrido.forEach((punto) => {
     const coordinates = extractCoordinates(punto.position);
     if (!coordinates) return;
 
     if (previousCoordinates) {
       const distance = calculateDistance(previousCoordinates, coordinates);
       if (distance < MIN_DISTANCE && punto.velocidad === 0) {
-        // Add to current cluster if within distance threshold and speed is 0
         currentCluster.push(punto);
         return;
       }
     }
 
-    // Finalize the current cluster if it exists
     if (currentCluster.length > 0) {
       aggregatedPoints.push({
-        ...currentCluster[0], // Use the first point's data
-        duration: currentCluster.length, // Add duration (number of points in cluster)
+        ...currentCluster[0],
+        duration: currentCluster.length,
       });
     }
 
-    // Start a new cluster
     currentCluster = [punto];
     previousCoordinates = coordinates;
   });
 
-  // Add the last cluster
   if (currentCluster.length > 0) {
     aggregatedPoints.push({
       ...currentCluster[0],
@@ -112,12 +119,15 @@ const aggregateStationaryPoints = (recorrido, extractCoordinates) => {
   return aggregatedPoints;
 };
 
-// Main CustomMarkers component
 const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }) => {
-  const addresses = useGeocodeAddresses(recorrido, extractCoordinates);
-
-  // Aggregate stationary points
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
+  const addresses = useGeocodeAddresses(recorrido, extractCoordinates, setLoadingAddresses);
   const aggregatedRecorrido = aggregateStationaryPoints(recorrido, extractCoordinates);
+
+  useEffect(() => {
+    console.log("Direcciones cargadas:", addresses);
+    console.log("Recorrido agregado:", aggregatedRecorrido);
+  }, [addresses, aggregatedRecorrido]);
 
   return (
     <>
@@ -160,10 +170,10 @@ const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }
                   <br />
                   <strong>Fecha:</strong> {formatFecha(punto.dia)}
                   <br />
-                  <strong>Duración:</strong>{" "}
-                  {punto.duration ? `${punto.duration} reportes` : "N/A"}
+                  <strong>Duración:</strong> {punto.duration ? `${punto.duration} reportes` : "N/A"}
                   <br />
-                  <strong>Dirección:</strong> {addresses[index] || "Cargando dirección..."}
+                  <strong>Dirección:</strong>{" "}
+                  {loadingAddresses ? "Cargando dirección..." : addresses[index] || "Dirección no disponible"}
                 </div>
               </Popup>
             </Marker>

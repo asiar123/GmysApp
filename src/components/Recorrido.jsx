@@ -8,6 +8,8 @@ const Recorrido = () => {
   const { vehiId } = useParams();
   const [recorrido, setRecorrido] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0); // Estado del progreso
+  const [direccionesCargadas, setDireccionesCargadas] = useState(false); // Si las direcciones están listas
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [ultimaPosicion, setUltimaPosicion] = useState(null);
@@ -46,7 +48,26 @@ const Recorrido = () => {
       if (Array.isArray(data)) {
         setRecorrido(data);
 
-        // Guardar la última posición
+        const incremento = 100 / data.length;
+        let progresoActual = 0;
+
+        // Procesar direcciones utilizando el caché del proxy
+        for (let i = 0; i < data.length; i++) {
+          const coords = extractCoordinates(data[i].position);
+          if (coords) {
+            try {
+              const direccion = await fetchAddressFromCache(coords); // Usar caché
+              data[i].direccion = direccion || "Dirección no disponible";
+            } catch (error) {
+              console.error("Error al cargar dirección:", error);
+              data[i].direccion = "Error al cargar dirección";
+            }
+          }
+          progresoActual += incremento;
+          setProgress(Math.min(progresoActual, 100));
+        }
+
+        setDireccionesCargadas(true); // Marcar las direcciones como cargadas
         const ultima = data.length > 0 ? extractCoordinates(data[data.length - 1].position) : null;
         setUltimaPosicion(ultima);
       }
@@ -54,6 +75,18 @@ const Recorrido = () => {
     } catch (error) {
       console.error("Error al obtener el recorrido:", error);
       setLoading(false);
+    }
+  };
+
+  const fetchAddressFromCache = async (coords) => {
+    try {
+      const response = await axios.get(`https://proxy-gmys.onrender.com/reverse-geocode`, {
+        params: { lat: coords[0], lon: coords[1] },
+      });
+      return response.data.display_name || "Dirección no disponible";
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Dirección no disponible";
     }
   };
 
@@ -76,19 +109,19 @@ const Recorrido = () => {
       <h1 className="text-2xl font-bold mb-4 text-center text-white">
         Recorrido del Vehículo {placa}
       </h1>
-      {loading ? (
-        <p className="text-center text-white">Cargando...</p>
+      {!direccionesCargadas ? (
+        <div className="progress-bar-wrapper">
+          <div className="loading-icon"></div>
+          <p className="progress-text">Cargando datos: {Math.round(progress)}%</p>
+        </div>
       ) : lineCoordinates.length > 0 ? (
-        <>
-          <RecorridoMap
-            recorrido={recorrido}
-            lineCoordinates={lineCoordinates}
-            ultimaPosicion={ultimaPosicion}
-            extractCoordinates={extractCoordinates}
-            formatFecha={formatFecha}
-          />
-          {ultimaPosicion}
-        </>
+        <RecorridoMap
+          recorrido={recorrido}
+          lineCoordinates={lineCoordinates}
+          ultimaPosicion={ultimaPosicion}
+          extractCoordinates={extractCoordinates}
+          formatFecha={formatFecha}
+        />
       ) : (
         <p className="text-center text-white">No hay datos de recorrido disponibles.</p>
       )}

@@ -1,9 +1,9 @@
 /* Contenedor para los botones */
 .botones-container {
-  position: fixed; /* Fijo para que siempre esté visible */
+  position: fixed; /* Siempre visible */
   bottom: 20px; /* Distancia desde la parte inferior */
   right: 10px; /* Distancia desde la parte derecha */
-  display: flex; /* Organizar los botones en fila */
+  display: flex; /* Organiza los botones en fila */
   gap: 10px; /* Separación entre los botones */
   z-index: 1000; /* Encima de otros elementos */
 }
@@ -13,7 +13,7 @@
   background-color: #1abc9c;
   color: white;
   border: none;
-  border-radius: 50%; /* Botón circular */
+  border-radius: 50%; /* Forma circular */
   width: 50px;
   height: 50px;
   cursor: pointer;
@@ -28,10 +28,11 @@
   background-color: #16a085;
 }
 
+/* Botón para ir a la primera posición */
 .ir-a-primera-posicion-btn {
   position: fixed;
   bottom: 80px; /* Ajusta según sea necesario */
-  left: 20px; /* Posición en relación al botón de última posición */
+  left: 20px; /* Posición respecto al botón de última posición */
   background-color: #f1c40f;
   color: white;
   border: none;
@@ -50,7 +51,6 @@
 .ir-a-primera-posicion-btn:hover {
   background-color: #d4ac0d;
 }
-
 
 /* Botón para reproducir el recorrido */
 .ir-a-inicio-btn {
@@ -72,13 +72,17 @@
   background-color: #2980b9;
 }
 
+/* Contenedor de la barra de progreso y texto */
+.progress-bar-wrapper {
+  position: relative; /* Relativo al contenedor principal */
+  margin-top: 10px; /* Espacio entre el mapa y el progreso */
+  text-align: center; /* Centra el texto y la barra */
+}
+
 /* Barra de progreso */
 .progreso-barra {
-  position: fixed;
-  bottom: 90px; /* Espaciado por encima de los botones */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%; /* Ocupa casi todo el ancho */
+  width: 80%; /* Ocupa un ancho razonable */
+  margin: 0 auto; /* Centra horizontalmente */
   height: 10px;
   background-color: #e0e0e0;
   border-radius: 5px;
@@ -89,29 +93,27 @@
 .progreso-barra .progreso {
   height: 100%;
   background-color: #3498db;
-  width: 0%; /* Ancho inicial */
-  transition: width 0.5s ease;
+  width: 0%; /* Inicialmente 0% */
+  transition: width 0.4s ease; /* Transición suave */
 }
 
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 768px) {
-  .botones-container {
-    bottom: 10px; /* Más cercano al borde */
-    right: 10px;
-    margin: 200px;
-  }
+/* Texto de progreso */
+.progress-text {
+  margin-top: 8px; /* Espacio entre la barra y el texto */
+  font-size: 16px; /* Tamaño más grande */
+  color: #ffffff; /* Contraste alto */
+  font-weight: bold; /* Destacar el texto */
+}
 
-  .ir-a-ultima-posicion-btn,
-  .ir-a-inicio-btn {
-    width: 45px; /* Tamaño más pequeño */
-    height: 45px; /* Tamaño más pequeño */
-    font-size: 16px;
-  }
-
-  .progreso-barra {
-    bottom: 80px;
-    width: 85%; /* Más estrecha para pantallas pequeñas */
-  }
+/* Spinner */
+.loading-icon {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3); /* Color semitransparente */
+  border-top-color: #ffffff; /* Color del borde superior */
+  border-radius: 50%; /* Forma circular */
+  animation: spin 1s linear infinite; /* Animación continua */
+  margin: 0 auto 8px; /* Centrado con margen inferior */
 }
 
 @keyframes spin {
@@ -120,5 +122,31 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+  .botones-container {
+    bottom: 10px; /* Más cercano al borde */
+    right: 10px;
+    gap: 5px; /* Reduce la separación entre botones */
+  }
+
+  .ir-a-ultima-posicion-btn,
+  .ir-a-primera-posicion-btn,
+  .ir-a-inicio-btn {
+    width: 40px; /* Tamaño más pequeño */
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .progreso-barra {
+    bottom: 15px; /* Más cercano al borde */
+    width: 80%; /* Más estrecha */
+  }
+
+  .progress-text {
+    font-size: 12px; /* Reduce el tamaño del texto */
   }
 }

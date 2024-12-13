@@ -21,10 +21,19 @@ const calculateDistance = ([lat1, lon1], [lat2, lon2]) => {
 
 const MIN_DISTANCE = 5;
 
+// Normalización de claves
+const normalizeKey = (lat, lon) => `${parseFloat(lat).toFixed(6)},${parseFloat(lon).toFixed(6)}`;
+
 const useGeocodeAddresses = (recorrido, extractCoordinates, setLoadingAddresses) => {
   const [addresses, setAddresses] = useState([]);
 
   useEffect(() => {
+    if (!recorrido || recorrido.length === 0) {
+      setAddresses([]);
+      setLoadingAddresses(false);
+      return;
+    }
+
     const fetchAllAddresses = async () => {
       setLoadingAddresses(true);
 
@@ -32,10 +41,12 @@ const useGeocodeAddresses = (recorrido, extractCoordinates, setLoadingAddresses)
         new Set(
           recorrido.map((punto) => {
             const coordinates = extractCoordinates(punto.position);
-            return coordinates ? `${coordinates[0]},${coordinates[1]}` : null;
+            return coordinates ? normalizeKey(coordinates[0], coordinates[1]) : null;
           })
         )
       ).filter((coord) => coord);
+
+      console.log("Coordenadas únicas normalizadas para geocodificación:", uniqueCoordinates);
 
       if (uniqueCoordinates.length === 0) {
         setAddresses([]);
@@ -52,16 +63,18 @@ const useGeocodeAddresses = (recorrido, extractCoordinates, setLoadingAddresses)
         });
 
         const addressMap = response.data;
-        const fetchedAddresses = recorrido.map((punto, i) => {
+        console.log("Mapa de direcciones recibido:", addressMap);
+
+        const fetchedAddresses = recorrido.map((punto) => {
           const coordinates = extractCoordinates(punto.position);
           if (coordinates) {
-            const key = `${coordinates[0]},${coordinates[1]}`;
-            if (addressMap[key]) {
-              return addressMap[key];
-            } else {
-              console.warn(`No se encontró dirección para el índice ${i}: ${key}`);
-              return "Dirección no disponible";
+            const key = normalizeKey(coordinates[0], coordinates[1]);
+            const addressData = addressMap[key];
+            if (addressData && addressData.address) {
+              const { road, city, state, country } = addressData.address;
+              return [road, city, state, country].filter(Boolean).join(", ") || "Dirección no disponible";
             }
+            return "Dirección no disponible";
           }
           return "Dirección no disponible";
         });
@@ -121,13 +134,23 @@ const aggregateStationaryPoints = (recorrido, extractCoordinates) => {
 
 const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }) => {
   const [loadingAddresses, setLoadingAddresses] = useState(true);
-  const addresses = useGeocodeAddresses(recorrido, extractCoordinates, setLoadingAddresses);
-  const aggregatedRecorrido = aggregateStationaryPoints(recorrido, extractCoordinates);
+  const [currentRecorrido, setCurrentRecorrido] = useState(recorrido);
+
+  useEffect(() => {
+    setCurrentRecorrido(recorrido);
+  }, [recorrido]);
+
+  const addresses = useGeocodeAddresses(currentRecorrido, extractCoordinates, setLoadingAddresses);
+  const aggregatedRecorrido = aggregateStationaryPoints(currentRecorrido, extractCoordinates);
 
   useEffect(() => {
     console.log("Direcciones cargadas:", addresses);
-    console.log("Recorrido agregado:", aggregatedRecorrido);
+    console.log("Recorrido procesado:", aggregatedRecorrido);
   }, [addresses, aggregatedRecorrido]);
+
+  if (!currentRecorrido || currentRecorrido.length === 0) {
+    return <p>No hay datos disponibles para mostrar.</p>;
+  }
 
   return (
     <>
@@ -166,14 +189,22 @@ const CustomMarkers = ({ recorrido, extractCoordinates, formatFecha, startIcon }
                   ></div>
                   <strong>Reporte:</strong> {index + 1} / {aggregatedRecorrido.length}
                   <br />
-                  <strong>Velocidad:</strong> {parseFloat(punto.velocidad).toFixed(1)} km/h
+                  <strong>Velocidad:</strong>{" "}
+                  {Number.isFinite(punto.velocidad)
+                    ? parseFloat(punto.velocidad).toFixed(1)
+                    : "N/A"} km/h
                   <br />
-                  <strong>Fecha:</strong> {formatFecha(punto.dia)}
+                  <strong>Fecha:</strong> {formatFecha(punto.dia) || "Fecha no disponible"}
                   <br />
-                  <strong>Duración:</strong> {punto.duration ? `${punto.duration} reportes` : "N/A"}
+                  <strong>Duración:</strong>{" "}
+                  {Number.isInteger(punto.duration) ? `${punto.duration} reportes` : "N/A"}
                   <br />
                   <strong>Dirección:</strong>{" "}
-                  {loadingAddresses ? "Cargando dirección..." : addresses[index] || "Dirección no disponible"}
+                  {loadingAddresses
+                    ? "Cargando dirección..."
+                    : addresses[index] !== undefined
+                    ? addresses[index]
+                    : "Dirección no disponible"}
                 </div>
               </Popup>
             </Marker>
